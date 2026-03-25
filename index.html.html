@@ -62,9 +62,12 @@
                 <p class="text-slate-400 text-sm mb-8">為保護您的醫療隱私，請輸入驗證資訊</p>
                 <div class="mb-5">
                     <label class="block text-slate-300 text-xs font-bold mb-2 tracking-wider">身分證字號</label>
-                    <input class="w-full bg-slate-800/50 border border-slate-600 text-white rounded-xl py-3 px-4 focus:outline-none focus:border-teal-400" type="text" placeholder="請輸入身分證字號">
+                    <input class="w-full bg-slate-800/50 border border-slate-600 text-white rounded-xl py-3 px-4 focus:outline-none focus:border-teal-400" type="text" placeholder="請輸入身分證字號 (Demo版免輸入)">
                 </div>
                 <button onclick="switchScreen('screen-dashboard')" class="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg mt-4">安全登入</button>
+                <p class="text-center text-red-400 text-[10px] mt-2 font-bold tracking-tight">
+                    &lt;此報告為DEMO版請直接點選「安全登入」體驗&gt;
+                </p>
             </div>
         </div>
 
@@ -92,6 +95,13 @@
                 </div>
             </div>
 
+            <div class="glass-card p-5 rounded-3xl mb-8 border border-white/5 shadow-inner">
+                <h3 class="text-white font-bold text-sm mb-4 pl-2 tracking-wide">📊 血糖趨勢追蹤 (三年)</h3>
+                <div class="w-full h-48">
+                    <canvas id="premiumLineChart"></canvas>
+                </div>
+            </div>
+
             <div class="glass-card rounded-2xl p-5 mb-8 border-l-4 border-l-teal-400">
                 <div class="flex items-center gap-2 mb-3">
                     <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
@@ -106,7 +116,7 @@
             </div>
 
             <h3 class="text-white font-bold text-sm mb-4 pl-2 tracking-wide">🎯 精準生活處方</h3>
-            <div class="space-y-4 mb-12">
+            <div class="space-y-4 mb-8">
                 
                 <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4">
                     <h4 class="text-teal-400 font-bold text-[13px] mb-2">🥗 1. 營養與腸道微生態重建</h4>
@@ -138,6 +148,29 @@
 
             </div>
 
+            <div class="glass-card p-5 rounded-3xl mb-8 border border-teal-500/20 shadow-[0_0_20px_rgba(45,212,191,0.1)]">
+                <p class="text-[10px] text-teal-400 font-bold mb-2 tracking-widest text-center">與您的代謝處方相容 (Marketplace Demo)</p>
+                <div class="flex gap-4 items-center">
+                    <div class="w-16 h-16 rounded-xl bg-slate-700/50 flex items-center justify-center border border-slate-600/50">
+                        <svg class="w-8 h-8 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 11-3-3 3 3 0 013 3z"></path></svg>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-white font-extrabold text-base mb-1">元馨嚴選：極地純淨 Omega-3 魚油</h3>
+                        <p class="text-slate-400 text-[10px] leading-snug">高濃度抗發炎脂肪酸，精準介入代謝與腸道修復軸，幫助提升 HDL-C 指標。</p>
+                    </div>
+                </div>
+                <button class="w-full mt-5 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-colors border border-slate-600">
+                    查看 Marketplace 商品詳情 (Demo Only)
+                </button>
+            </div>
+
+            <div class="glass-card p-5 rounded-3xl mb-12">
+                <h3 class="text-white font-bold text-sm mb-4 pl-2 tracking-wide">🧠 全面維度分析 (功能醫學視角)</h3>
+                <div class="w-full h-56">
+                    <canvas id="demoRadarChart"></canvas>
+                </div>
+            </div>
+
             <div class="text-center pb-8">
                 <button onclick="switchScreen('screen-landing')" class="text-slate-500 hover:text-slate-300 text-xs font-bold underline">返回首頁</button>
             </div>
@@ -147,6 +180,7 @@
     <script>
         async function initializeLiff() {
             try {
+                // 保留你的 LIFF ID
                 await liff.init({ liffId: "2009597152-9nSswjnk" }); 
             } catch (err) { console.error("LIFF Error", err); }
         }
@@ -159,7 +193,88 @@
             });
             document.getElementById(targetId).classList.remove('hidden');
             document.getElementById(targetId).classList.add('block');
+            
+            if (targetId === 'screen-dashboard') { 
+                initPremiumLineChart(); 
+                initRadarChart();
+            }
             window.scrollTo(0, 0);
+        }
+
+        let isRadarChartRendered = false;
+        function initRadarChart() {
+            if (isRadarChartRendered) return;
+            const ctxRadar = document.getElementById('demoRadarChart').getContext('2d');
+            new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: ['體重', '代謝', '睡眠', '壓力', '運動', '心血管'],
+                    datasets: [{
+                        label: '健康維度分數',
+                        data: [80, 95, 85, 70, 90, 88],
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 100,
+                            ticks: { display: false },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            angleLines: { color: 'rgba(255, 255, 255, 0.05)' },
+                            pointLabels: { color: '#94a3b8', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+            isRadarChartRendered = true;
+        }
+
+        let isLineChartRendered = false;
+        function initPremiumLineChart() {
+            if (isLineChartRendered) return;
+            const ctxLine = document.getElementById('premiumLineChart').getContext('2d');
+            
+            let gradientLine = ctxLine.createLinearGradient(0, 0, 0, 200);
+            gradientLine.addColorStop(0, 'rgba(45, 212, 191, 0.5)'); // Teal
+            gradientLine.addColorStop(1, 'rgba(45, 212, 191, 0.0)');
+
+            new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['2024', '2025', '2026'],
+                    datasets: [{
+                        label: '空腹血糖 (mg/dL)',
+                        data: [108, 102, 95], // Restored premium line data
+                        borderColor: '#2DD4BF', // Teal-400
+                        backgroundColor: gradientLine,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#0B1120',
+                        pointBorderColor: '#2DD4BF',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        fill: true,
+                        tension: 0.4 
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(30, 41, 59, 0.9)', titleColor: '#fff', bodyColor: '#2DD4BF', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1 } },
+                    scales: {
+                        x: { grid: { display: false, drawBorder: false } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)', borderDash: [5, 5] }, min: 80, max: 120 }
+                    }
+                }
+            });
+            isLineChartRendered = true;
         }
     </script>
 </body>
