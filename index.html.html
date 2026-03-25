@@ -6,189 +6,201 @@
     <title>元馨醫管家 - AI深度解析報告</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        /* 隱藏捲軸但保持可捲動，模擬 APP 體驗 */
+        /* 隱藏捲軸與全畫面深色背景設定 */
+        body { background-color: #0B1120; color: #F8FAFC; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* 高階毛玻璃特效卡片 */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        /* 漸層文字 */
+        .text-gradient {
+            background: linear-gradient(135deg, #2DD4BF 0%, #3B82F6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
     </style>
 </head>
-<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+<body class="flex justify-center items-center min-h-screen">
 
-    <div class="w-full max-w-md bg-white min-h-screen shadow-2xl relative overflow-hidden no-scrollbar">
+    <div class="w-full max-w-md bg-[#0B1120] min-h-screen relative overflow-x-hidden overflow-y-auto no-scrollbar pb-24">
         
-        <div id="screen-landing" class="block pb-24">
-            <div class="bg-gradient-to-r from-blue-600 to-teal-500 p-6 text-white rounded-b-3xl shadow-md">
-                <h1 class="text-2xl font-bold text-center tracking-wider">元馨醫管家</h1>
-                <p class="text-center text-sm mt-1 opacity-90">預防醫學平台</p>
+        <div class="absolute top-0 left-0 w-full h-96 bg-blue-900/20 rounded-full blur-3xl -translate-y-1/2 pointer-events-none"></div>
+
+        <div id="screen-landing" class="block px-6 pt-12 relative z-10">
+            
+            <div class="text-center mb-10">
+                <p class="text-teal-400 text-sm font-semibold tracking-widest mb-2">YUANXIN HEALTHCARE</p>
+                <h1 class="text-4xl font-bold text-white tracking-wide mb-3">AI 深度解析報告</h1>
+                <p class="text-slate-400 text-sm">數據驅動，為您預見未來的健康樣貌</p>
             </div>
 
-            <div class="text-center mt-6 px-4">
-                <h2 class="text-3xl font-extrabold text-gray-800">AI 深度解析報告</h2>
-                <p class="text-gray-500 mt-2 text-sm">數據驅動，掌握您的黃金健康趨勢</p>
-            </div>
-
-            <div class="mt-8 mx-6 bg-white rounded-2xl shadow-lg p-6 border border-gray-100 relative overflow-hidden">
-                <div class="absolute top-0 right-0 bg-yellow-400 text-xs font-bold px-3 py-1 rounded-bl-lg">Demo</div>
-                <h3 class="text-center text-gray-600 font-semibold mb-2">綜合健康分數</h3>
-                <div class="flex justify-center items-end gap-2">
-                    <span class="text-5xl font-black text-blue-600">90</span>
-                    <span class="text-xl font-bold text-gray-400 mb-1">分</span>
-                    <span class="text-3xl font-black text-green-500 ml-2">A+</span>
+            <div class="glass-card rounded-3xl p-8 relative flex flex-col items-center justify-center">
+                <div class="absolute top-4 right-5 text-xs font-bold text-teal-300 border border-teal-300/30 px-2 py-1 rounded-md">DEMO</div>
+                <h2 class="text-slate-300 text-sm tracking-widest mb-6">綜合健康評級</h2>
+                
+                <div class="relative w-40 h-40 rounded-full flex items-center justify-center border-4 border-slate-700 shadow-[0_0_30px_rgba(45,212,191,0.2)]">
+                    <div class="absolute inset-0 rounded-full border-4 border-t-teal-400 border-r-blue-500 border-b-transparent border-l-transparent transform rotate-45"></div>
+                    <div class="text-center">
+                        <span class="text-6xl font-black text-white">90</span>
+                        <span class="text-teal-400 font-bold ml-1">A+</span>
+                    </div>
                 </div>
-                <p class="text-center text-xs text-gray-400 mt-2">您的狀態優於 85% 同齡層</p>
+                <p class="text-slate-400 text-xs mt-6 text-center leading-relaxed">您的生理機能狀態極佳<br>優於同齡群體 <span class="text-teal-400 font-bold">85%</span></p>
             </div>
 
-            <div class="mt-6 mx-6">
-                <h3 class="text-sm font-bold text-gray-700 mb-2 pl-1">健康力雷達圖</h3>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                    <canvas id="demoRadarChart"></canvas>
-                </div>
-            </div>
-
-            <div class="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-200 p-4">
-                <button onclick="switchScreen('screen-auth')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition duration-200">
-                    查看我的專屬報告
+            <div class="fixed bottom-0 left-0 w-full flex justify-center pb-8 pt-12 bg-gradient-to-t from-[#0B1120] via-[#0B1120] to-transparent z-50">
+                <button onclick="switchScreen('screen-auth')" class="w-[85%] max-w-sm bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold py-4 px-6 rounded-2xl shadow-[0_10px_25px_-5px_rgba(45,212,191,0.4)] hover:scale-[1.02] transition-transform">
+                    查看專屬解析報告
                 </button>
             </div>
         </div>
 
-        <div id="screen-auth" class="hidden h-screen flex flex-col justify-center px-8 bg-gray-50">
-            <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold text-gray-800">身分安全驗證</h2>
-                <p class="text-gray-500 mt-2 text-sm">為保護您的醫療隱私，請進行驗證</p>
-            </div>
+        <div id="screen-auth" class="hidden h-screen flex flex-col justify-center px-6 relative z-10">
+            <div class="glass-card rounded-3xl p-8 border-t border-white/10">
+                <h2 class="text-2xl font-bold text-white mb-2">身分安全驗證</h2>
+                <p class="text-slate-400 text-sm mb-8">為保護您的醫療隱私，請輸入驗證資訊</p>
 
-            <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
-                <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="id-number">身分證字號</label>
-                    <input class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase" id="id-number" type="text" placeholder="A123456789">
+                <div class="mb-5">
+                    <label class="block text-slate-300 text-xs font-bold mb-2 tracking-wider">身分證字號</label>
+                    <input class="w-full bg-slate-800/50 border border-slate-600 text-white rounded-xl py-3 px-4 focus:outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400 uppercase transition-colors" type="text" placeholder="請輸入身分證字號">
                 </div>
-                <div class="mb-6">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="dob">出生年月日</label>
-                    <input class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" id="dob" type="date">
+                <div class="mb-8">
+                    <label class="block text-slate-300 text-xs font-bold mb-2 tracking-wider">出生年月日</label>
+                    <input class="w-full bg-slate-800/50 border border-slate-600 text-white rounded-xl py-3 px-4 focus:outline-none focus:border-teal-400 focus:ring-1 focus:ring-teal-400 transition-colors" type="date">
                 </div>
-                <button onclick="switchScreen('screen-dashboard')" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition duration-200">
+                
+                <button onclick="switchScreen('screen-dashboard')" class="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition-transform hover:scale-[1.02]">
                     安全登入
                 </button>
-                <button onclick="switchScreen('screen-landing')" class="w-full mt-4 text-gray-400 hover:text-gray-600 text-sm font-bold py-2 transition duration-200">
-                    返回上一頁
+                <button onclick="switchScreen('screen-landing')" class="w-full mt-4 text-slate-500 hover:text-slate-300 text-sm font-bold py-2 transition-colors">
+                    取消並返回
                 </button>
             </div>
         </div>
 
-        <div id="screen-dashboard" class="hidden pb-10 bg-gray-50 min-h-screen">
-            <div class="bg-blue-600 p-6 pt-8 text-white rounded-b-3xl">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-bold">王大明 先生，您好</h2>
-                        <p class="text-xs opacity-80 mt-1">最新報告日期：2026/03/15</p>
-                    </div>
-                    <div class="bg-white text-blue-600 font-bold w-12 h-12 rounded-full flex items-center justify-center text-xl shadow-inner">
-                        88
-                    </div>
+        <div id="screen-dashboard" class="hidden px-5 pt-10 relative z-10">
+            <div class="flex justify-between items-end mb-8 pl-2">
+                <div>
+                    <h2 class="text-2xl font-bold text-white tracking-wide">吳惠君 <span class="text-sm text-slate-400 font-normal">女士</span></h2>
+                    <p class="text-xs text-teal-400 mt-1">最新報告解析完成 (2026/03)</p>
+                </div>
+                <div class="w-12 h-12 rounded-full border border-teal-400 flex items-center justify-center bg-teal-400/10 shadow-[0_0_15px_rgba(45,212,191,0.2)]">
+                    <span class="text-xl font-bold text-teal-300">82</span>
                 </div>
             </div>
 
-            <div class="px-5 mt-6 grid grid-cols-2 gap-4">
-                <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-green-400">
-                    <p class="text-xs text-gray-500 font-bold">代謝機能</p>
-                    <p class="text-lg font-black text-gray-800 mt-1">正常</p>
-                    <p class="text-xs text-green-500 mt-1">血糖穩定控制中</p>
+            <div class="glass-card rounded-2xl p-5 mb-6 border-l-4 border-l-teal-400">
+                <div class="flex items-center gap-2 mb-2">
+                    <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <h3 class="text-white font-bold text-sm">AI 總評摘要</h3>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-red-400 relative">
-                    <div class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-ping"></div>
-                    <p class="text-xs text-gray-500 font-bold">體重/BMI</p>
-                    <p class="text-lg font-black text-gray-800 mt-1">26.5 <span class="text-xs font-normal">過重</span></p>
-                    <p class="text-xs text-red-500 mt-1">需注意脂肪肝風險</p>
+                <p class="text-slate-300 text-sm leading-relaxed">整體狀況良好，但代謝機能有輕微異常。高密度膽固醇 (HDL-C) 偏低，建議增加有氧運動與攝取優質油脂以提升心血管保護力。</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="glass-card p-4 rounded-2xl">
+                    <p class="text-xs text-slate-400 font-bold mb-1">心血管風險</p>
+                    <p class="text-xl font-black text-white">低度</p>
+                    <p class="text-[10px] text-teal-400 mt-1">血壓數值優良</p>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-yellow-400">
-                    <p class="text-xs text-gray-500 font-bold">壓力指數</p>
-                    <p class="text-lg font-black text-gray-800 mt-1">偏高</p>
-                    <p class="text-xs text-yellow-600 mt-1">建議增加放鬆活動</p>
-                </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-blue-400">
-                    <p class="text-xs text-gray-500 font-bold">睡眠品質</p>
-                    <p class="text-lg font-black text-gray-800 mt-1">良好</p>
-                    <p class="text-xs text-blue-500 mt-1">深層睡眠達標</p>
+                <div class="glass-card p-4 rounded-2xl relative border border-red-500/30 bg-red-900/10">
+                    <div class="absolute top-3 right-3 w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                    <p class="text-xs text-slate-400 font-bold mb-1">代謝機能</p>
+                    <p class="text-xl font-black text-white">異常</p>
+                    <p class="text-[10px] text-red-400 mt-1">HDL-C 偏低 (42)</p>
                 </div>
             </div>
 
-            <div class="mt-8 px-5">
-                <div class="flex justify-between items-end mb-2">
-                    <h3 class="text-md font-bold text-gray-800">血糖三年走勢比對</h3>
-                    <span class="text-xs text-blue-600 font-bold cursor-pointer">查看 AI 摘要 ></span>
-                </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-                    <canvas id="trendLineChart"></canvas>
+            <div class="glass-card p-5 rounded-3xl mb-12">
+                <h3 class="text-sm font-bold text-white mb-4">血糖趨勢追蹤 (三年)</h3>
+                <div class="w-full h-48">
+                    <canvas id="premiumLineChart"></canvas>
                 </div>
             </div>
-            
-            <div class="mt-8 text-center px-5">
-                <button onclick="switchScreen('screen-landing')" class="text-gray-400 hover:text-gray-600 text-sm font-bold underline">
-                    登出並返回首頁
-                </button>
+
+            <div class="text-center pb-8">
+                <button onclick="switchScreen('screen-landing')" class="text-slate-500 hover:text-slate-300 text-xs font-bold underline">登出系統</button>
             </div>
         </div>
-
     </div>
 
     <script>
-        // 切換畫面的函數
+        // LIFF 初始化 (保留您的 LIFF ID)
+        async function initializeLiff() {
+            try {
+                await liff.init({ liffId: "2009597152-9nSswjnk" }); 
+                if (!liff.isLoggedIn()) {
+                    // 在正式環境中會啟用登入，Demo 先註解避免跳轉
+                    // liff.login(); 
+                }
+            } catch (err) { console.error("LIFF Error", err); }
+        }
+        initializeLiff();
+
+        // 畫面切換邏輯
         function switchScreen(targetId) {
-            const screens = ['screen-landing', 'screen-auth', 'screen-dashboard'];
-            screens.forEach(id => {
+            ['screen-landing', 'screen-auth', 'screen-dashboard'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
                 document.getElementById(id).classList.remove('block');
             });
             document.getElementById(targetId).classList.remove('hidden');
             document.getElementById(targetId).classList.add('block');
             
-            // 如果進入 Dashboard，且圖表還沒畫過，就觸發畫圖
-            if (targetId === 'screen-dashboard') {
-                initDashboardChart();
-            }
+            if (targetId === 'screen-dashboard') { initPremiumChart(); }
+            window.scrollTo(0, 0);
         }
 
-        // 渲染 Landing Page 的雷達圖
-        const ctxRadar = document.getElementById('demoRadarChart').getContext('2d');
-        new Chart(ctxRadar, {
-            type: 'radar',
-            data: {
-                labels: ['體重', '代謝', '睡眠', '壓力', '運動', '心血管'],
-                datasets: [{
-                    label: '健康維度分數',
-                    data: [80, 95, 85, 70, 90, 88],
-                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                    borderColor: 'rgba(59, 130, 246, 1)',
-                    pointBackgroundColor: 'rgba(59, 130, 246, 1)',
-                    borderWidth: 2
-                }]
-            },
-            options: { scales: { r: { min: 0, max: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } }
-        });
+        // 繪製高階 Chart.js 折線圖
+        let isChartRendered = false;
+        function initPremiumChart() {
+            if (isChartRendered) return;
+            const ctx = document.getElementById('premiumLineChart').getContext('2d');
+            
+            // 建立漸層填充效果
+            let gradient = ctx.createLinearGradient(0, 0, 0, 200);
+            gradient.addColorStop(0, 'rgba(45, 212, 191, 0.5)'); // Teal
+            gradient.addColorStop(1, 'rgba(45, 212, 191, 0.0)');
 
-        // 渲染 Dashboard 的折線圖 (三年趨勢)
-        let isDashboardChartRendered = false;
-        function initDashboardChart() {
-            if (isDashboardChartRendered) return;
-            const ctxLine = document.getElementById('trendLineChart').getContext('2d');
-            new Chart(ctxLine, {
+            Chart.defaults.color = '#94a3b8';
+            Chart.defaults.font.family = 'sans-serif';
+
+            new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['2024', '2025', '2026(最新)'],
+                    labels: ['2024', '2025', '2026'],
                     datasets: [{
-                        label: '空腹血糖值 (mg/dL)',
-                        data: [112, 105, 98],
-                        borderColor: 'rgba(20, 184, 166, 1)',
-                        backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                        label: '空腹血糖 (mg/dL)',
+                        data: [108, 102, 95],
+                        borderColor: '#2DD4BF', // Teal-400
+                        backgroundColor: gradient,
                         borderWidth: 3,
+                        pointBackgroundColor: '#0B1120',
+                        pointBorderColor: '#2DD4BF',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
                         fill: true,
-                        tension: 0.3
+                        tension: 0.4 // 平滑曲線
                     }]
                 },
-                options: { plugins: { legend: { position: 'bottom' } } }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(30, 41, 59, 0.9)', titleColor: '#fff', bodyColor: '#2DD4BF', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1 } },
+                    scales: {
+                        x: { grid: { display: false, drawBorder: false } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)', borderDash: [5, 5] }, min: 80, max: 120 }
+                    }
+                }
             });
-            isDashboardChartRendered = true;
+            isChartRendered = true;
         }
     </script>
 </body>
