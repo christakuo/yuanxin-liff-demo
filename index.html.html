@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>元馨醫管家 - AI深度解析報告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* 隱藏捲軸但保持可捲動，模擬 APP 體驗 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-gray-100 flex justify-center items-center min-h-screen">
+
+    <div class="w-full max-w-md bg-white min-h-screen shadow-2xl relative overflow-hidden no-scrollbar">
+        
+        <div id="screen-landing" class="block pb-24">
+            <div class="bg-gradient-to-r from-blue-600 to-teal-500 p-6 text-white rounded-b-3xl shadow-md">
+                <h1 class="text-2xl font-bold text-center tracking-wider">元馨醫管家</h1>
+                <p class="text-center text-sm mt-1 opacity-90">預防醫學平台</p>
+            </div>
+
+            <div class="text-center mt-6 px-4">
+                <h2 class="text-3xl font-extrabold text-gray-800">AI 深度解析報告</h2>
+                <p class="text-gray-500 mt-2 text-sm">數據驅動，掌握您的黃金健康趨勢</p>
+            </div>
+
+            <div class="mt-8 mx-6 bg-white rounded-2xl shadow-lg p-6 border border-gray-100 relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-yellow-400 text-xs font-bold px-3 py-1 rounded-bl-lg">Demo</div>
+                <h3 class="text-center text-gray-600 font-semibold mb-2">綜合健康分數</h3>
+                <div class="flex justify-center items-end gap-2">
+                    <span class="text-5xl font-black text-blue-600">90</span>
+                    <span class="text-xl font-bold text-gray-400 mb-1">分</span>
+                    <span class="text-3xl font-black text-green-500 ml-2">A+</span>
+                </div>
+                <p class="text-center text-xs text-gray-400 mt-2">您的狀態優於 85% 同齡層</p>
+            </div>
+
+            <div class="mt-6 mx-6">
+                <h3 class="text-sm font-bold text-gray-700 mb-2 pl-1">健康力雷達圖</h3>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <canvas id="demoRadarChart"></canvas>
+                </div>
+            </div>
+
+            <div class="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-200 p-4">
+                <button onclick="switchScreen('screen-auth')" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition duration-200">
+                    查看我的專屬報告
+                </button>
+            </div>
+        </div>
+
+        <div id="screen-auth" class="hidden h-screen flex flex-col justify-center px-8 bg-gray-50">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-gray-800">身分安全驗證</h2>
+                <p class="text-gray-500 mt-2 text-sm">為保護您的醫療隱私，請進行驗證</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="id-number">身分證字號</label>
+                    <input class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase" id="id-number" type="text" placeholder="A123456789">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="dob">出生年月日</label>
+                    <input class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" id="dob" type="date">
+                </div>
+                <button onclick="switchScreen('screen-dashboard')" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-4 rounded-xl shadow-md transition duration-200">
+                    安全登入
+                </button>
+                <button onclick="switchScreen('screen-landing')" class="w-full mt-4 text-gray-400 hover:text-gray-600 text-sm font-bold py-2 transition duration-200">
+                    返回上一頁
+                </button>
+            </div>
+        </div>
+
+        <div id="screen-dashboard" class="hidden pb-10 bg-gray-50 min-h-screen">
+            <div class="bg-blue-600 p-6 pt-8 text-white rounded-b-3xl">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold">王大明 先生，您好</h2>
+                        <p class="text-xs opacity-80 mt-1">最新報告日期：2026/03/15</p>
+                    </div>
+                    <div class="bg-white text-blue-600 font-bold w-12 h-12 rounded-full flex items-center justify-center text-xl shadow-inner">
+                        88
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-5 mt-6 grid grid-cols-2 gap-4">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-green-400">
+                    <p class="text-xs text-gray-500 font-bold">代謝機能</p>
+                    <p class="text-lg font-black text-gray-800 mt-1">正常</p>
+                    <p class="text-xs text-green-500 mt-1">血糖穩定控制中</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-red-400 relative">
+                    <div class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-ping"></div>
+                    <p class="text-xs text-gray-500 font-bold">體重/BMI</p>
+                    <p class="text-lg font-black text-gray-800 mt-1">26.5 <span class="text-xs font-normal">過重</span></p>
+                    <p class="text-xs text-red-500 mt-1">需注意脂肪肝風險</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-yellow-400">
+                    <p class="text-xs text-gray-500 font-bold">壓力指數</p>
+                    <p class="text-lg font-black text-gray-800 mt-1">偏高</p>
+                    <p class="text-xs text-yellow-600 mt-1">建議增加放鬆活動</p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border-l-4 border-blue-400">
+                    <p class="text-xs text-gray-500 font-bold">睡眠品質</p>
+                    <p class="text-lg font-black text-gray-800 mt-1">良好</p>
+                    <p class="text-xs text-blue-500 mt-1">深層睡眠達標</p>
+                </div>
+            </div>
+
+            <div class="mt-8 px-5">
+                <div class="flex justify-between items-end mb-2">
+                    <h3 class="text-md font-bold text-gray-800">血糖三年走勢比對</h3>
+                    <span class="text-xs text-blue-600 font-bold cursor-pointer">查看 AI 摘要 ></span>
+                </div>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <canvas id="trendLineChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center px-5">
+                <button onclick="switchScreen('screen-landing')" class="text-gray-400 hover:text-gray-600 text-sm font-bold underline">
+                    登出並返回首頁
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // 切換畫面的函數
+        function switchScreen(targetId) {
+            const screens = ['screen-landing', 'screen-auth', 'screen-dashboard'];
+            screens.forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+                document.getElementById(id).classList.remove('block');
+            });
+            document.getElementById(targetId).classList.remove('hidden');
+            document.getElementById(targetId).classList.add('block');
+            
+            // 如果進入 Dashboard，且圖表還沒畫過，就觸發畫圖
+            if (targetId === 'screen-dashboard') {
+                initDashboardChart();
+            }
+        }
+
+        // 渲染 Landing Page 的雷達圖
+        const ctxRadar = document.getElementById('demoRadarChart').getContext('2d');
+        new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: ['體重', '代謝', '睡眠', '壓力', '運動', '心血管'],
+                datasets: [{
+                    label: '健康維度分數',
+                    data: [80, 95, 85, 70, 90, 88],
+                    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 2
+                }]
+            },
+            options: { scales: { r: { min: 0, max: 100, ticks: { display: false } } }, plugins: { legend: { display: false } } }
+        });
+
+        // 渲染 Dashboard 的折線圖 (三年趨勢)
+        let isDashboardChartRendered = false;
+        function initDashboardChart() {
+            if (isDashboardChartRendered) return;
+            const ctxLine = document.getElementById('trendLineChart').getContext('2d');
+            new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: ['2024', '2025', '2026(最新)'],
+                    datasets: [{
+                        label: '空腹血糖值 (mg/dL)',
+                        data: [112, 105, 98],
+                        borderColor: 'rgba(20, 184, 166, 1)',
+                        backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: { plugins: { legend: { position: 'bottom' } } }
+            });
+            isDashboardChartRendered = true;
+        }
+    </script>
+</body>
+</html>
