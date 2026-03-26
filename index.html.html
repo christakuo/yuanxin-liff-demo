@@ -70,9 +70,7 @@
 
             <div class="glass-card p-5 rounded-3xl mb-8 border border-white/5 shadow-inner">
                 <h3 class="text-white font-bold text-sm mb-4 pl-2 tracking-wide">📊 血糖趨勢追蹤 (三年)</h3>
-                <div class="w-full h-48">
-                    <canvas id="premiumLineChart"></canvas>
-                </div>
+                <div class="w-full h-48"><canvas id="premiumLineChart"></canvas></div>
             </div>
 
             <div class="glass-card rounded-2xl p-5 mb-8 border-l-4 border-l-teal-400">
@@ -81,36 +79,13 @@
                     <h3 class="text-white font-bold text-base tracking-wide">專屬健康洞察</h3>
                 </div>
                 <p class="text-slate-300 text-[13px] leading-relaxed mb-3">
-                    您在肝腎功能表現優異。然而，透過多項代謝指標交叉比對，系統觀察到您正處於<span class="text-teal-400 font-bold">「代謝效率轉換期」</span>。
+                    您在肝腎功能表現優異。然而，透過多項代謝指標交叉比對，系統觀察到您正處於<span class="text-teal-400 font-bold">「代謝效率轉換期」</span>。您的 HDL-C 偏低與空腹血糖微幅上升，暗示著<span class="text-red-400 font-bold">早期胰島素阻抗</span>的萌芽。這不僅增加心血管隱性負擔，也容易引發午後疲勞或皮膚暗沈。請放心，透過以下處方，我們能輕鬆喚醒細胞代謝力，逆轉此狀態。
                 </p>
-                <p class="text-slate-300 text-[13px] leading-relaxed">
-                    您的 HDL-C 偏低與空腹血糖微幅上升，暗示著<span class="text-red-400 font-bold">早期胰島素阻抗</span>的萌芽。這不僅增加心血管隱性負擔，也容易引發午後疲勞或皮膚暗沈。請放心，透過以下處方，我們能輕鬆喚醒細胞代謝力，逆轉此狀態。
-                </p>
-            </div>
-
-            <h3 class="text-white font-bold text-sm mb-4 pl-2 tracking-wide">🎯 精準生活處方</h3>
-            <div class="space-y-4 mb-8">
-                <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4">
-                    <h4 class="text-teal-400 font-bold text-[13px] mb-2">🥗 1. 營養與腸道微生態重建</h4>
-                    <ul class="text-slate-300 text-[12px] space-y-2 list-none">
-                        <li class="flex gap-2"><span class="text-teal-500">•</span><span><strong class="text-white">碳水後置法：</strong>用餐先吃蛋白質與蔬菜，最後吃澱粉，延緩腸道吸收糖分。</span></li>
-                        <li class="flex gap-2"><span class="text-teal-500">•</span><span><strong class="text-white">抗發炎好油介入：</strong>每週 3 次深海魚類，補充 Omega-3 修復腸道黏膜。</span></li>
-                    </ul>
-                </div>
-                <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4">
-                    <h4 class="text-teal-400 font-bold text-[13px] mb-2">🏃‍♀️ 2. 細胞粒線體優化運動</h4>
-                    <ul class="text-slate-300 text-[12px] space-y-2 list-none">
-                        <li class="flex gap-2"><span class="text-teal-500">•</span><span><strong class="text-white">Zone 2 有氧：</strong>每週 3 次、每次 40 分鐘超慢跑，提升好膽固醇並增加燃脂效率。</span></li>
-                        <li class="flex gap-2"><span class="text-teal-500">•</span><span><strong class="text-white">阻力訓練：</strong>肌肉是最大的血糖儲藏室。每週 2 次下肢訓練（如深蹲）能吸走多餘糖分。</span></li>
-                    </ul>
-                </div>
             </div>
 
             <div class="glass-card p-5 rounded-3xl mb-12">
-                <h3 class="text-white font-bold text-sm mb-4 pl-2 tracking-wide">🧠 全面維度分析 (功能醫學視角)</h3>
-                <div class="w-full h-56">
-                    <canvas id="demoRadarChart"></canvas>
-                </div>
+                <h3 class="text-white font-bold text-sm mb-4 pl-2 tracking-wide">🧠 全面維度分析</h3>
+                <div class="w-full h-56"><canvas id="demoRadarChart"></canvas></div>
             </div>
 
             <div class="mt-8 mb-6 border-t border-slate-700 pt-8">
@@ -133,9 +108,10 @@
                 <p class="text-slate-400 text-sm mb-8">為保護您的醫療隱私，請輸入您的真實身分證字號，以建立加密健康檔案。</p>
                 <div class="mb-5">
                     <label class="block text-slate-300 text-xs font-bold mb-2 tracking-wider">真實身分證字號</label>
-                    <input class="w-full bg-slate-800 border border-slate-600 text-white rounded-xl py-3 px-4 focus:outline-none focus:border-teal-400" type="text" placeholder="請輸入身分證字號">
+                    <input id="realIdInput" class="w-full bg-slate-800 border border-slate-600 text-white rounded-xl py-3 px-4 focus:outline-none focus:border-teal-400 uppercase" type="text" placeholder="例如：A123456789" maxlength="10">
+                    <p id="idErrorMsg" class="text-red-400 text-xs mt-2 hidden">⚠️ 格式錯誤，請輸入大寫英文字母加9位數字</p>
                 </div>
-                <button onclick="switchScreen('screen-upload')" class="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg mt-4">安全登入</button>
+                <button onclick="validateRealId()" class="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg mt-4">安全登入</button>
             </div>
             <div class="text-center mt-6">
                 <button onclick="switchScreen('screen-dashboard')" class="text-slate-500 hover:text-slate-300 text-xs font-bold underline">返回 Demo 報告</button>
@@ -143,60 +119,38 @@
         </div>
 
         <div id="screen-upload" class="hidden px-5 pt-12 relative z-10 min-h-screen flex flex-col">
-            <div class="glass-card rounded-2xl p-6 mb-8 border border-amber-500/30 shadow-[0_0_20px_rgba(245,158,11,0.15)] flex-1">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                    </div>
-                    <h3 class="text-white font-bold text-lg tracking-wide">上傳真實報告</h3>
-                </div>
+            <div class="glass-card rounded-2xl p-6 mb-8 border border-teal-500/30 shadow-[0_0_20px_rgba(45,212,191,0.15)] flex-1 text-center flex flex-col justify-center items-center">
                 
-                <p class="text-slate-300 text-xs mb-6 leading-relaxed bg-amber-950/40 p-3.5 rounded-lg border border-amber-800/50">
-                    <strong class="text-amber-400 block mb-1">🛡️ 醫療級資安承諾：</strong>
-                    您上傳的照片將透過 SSL 加密技術安全傳送至醫療分析小組。系統預計於<strong class="text-amber-400">一個工作天後</strong>產出深度解析報告，並透過 LINE 官方帳號推播通知您。
+                <div class="w-16 h-16 rounded-full bg-teal-500/20 flex items-center justify-center text-teal-400 mb-6 mx-auto">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h3 class="text-white font-bold text-xl tracking-wide mb-2">身分驗證成功</h3>
+                <p class="text-teal-400 font-bold mb-6" id="displayVerifiedId"></p>
+                
+                <p class="text-slate-300 text-sm mb-8 leading-relaxed bg-slate-800/80 p-4 rounded-xl text-left border border-slate-700">
+                    <strong class="text-white block mb-2">📥 下一步：上傳報告</strong>
+                    為支援多頁、高畫質圖檔及 PDF 格式，我們將採用 LINE 官方加密聊天室為您進行傳輸。<br><br>
+                    請點擊下方按鈕，系統將自動為您向醫管家發送建檔指令，您即可在聊天室中**一次選取多張照片或檔案**進行上傳。
                 </p>
                 
-                <form id="uploadForm" action="https://formspree.io/f/xeepqlok" method="POST" enctype="multipart/form-data" class="space-y-5">
-                    <input type="hidden" name="_subject" value="【元馨報告上傳】新的客戶報告來信">
-                    <input type="hidden" id="lineUidInput" name="lineUid" value="UID: 待抓取">
-                    <input type="hidden" name="customerName" value="實戰用戶上傳">
-
-                    <div>
-                        <label class="block text-sm text-slate-200 font-bold tracking-widest mb-2">1. 選擇報告照片</label>
-                        <p class="text-[10px] text-slate-500 mb-2">請確保文字清晰、無嚴重反光</p>
-                        <input type="file" name="upload" accept="image/*" class="w-full text-sm text-slate-300 bg-slate-800/80 rounded-xl px-4 py-3 border border-slate-600 focus:border-teal-500 outline-none" required>
-                    </div>
-                    
-                    <div class="pt-4 border-t border-slate-700/50">
-                        <label class="block text-sm text-slate-200 font-bold tracking-widest mb-3">2. 確認無誤後送出</label>
-                        <button type="submit" class="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold py-4 px-4 rounded-xl text-sm shadow-lg hover:shadow-teal-500/25 transition-all">
-                            安全上傳我的健檢報告
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="text-center pb-8 mt-auto">
-                <button onclick="switchScreen('screen-auth-demo')" class="text-slate-500 hover:text-slate-300 text-sm font-bold underline tracking-wider">返回首頁</button>
+                <button onclick="sendLineMessageAndClose()" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-4 px-4 rounded-xl text-base shadow-lg transition-all flex items-center justify-center gap-2">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.036 9.608.391.084.922.258 1.057.592.114.281.072.717.035.942-.052.316-.333 2.029-.408 2.454-.127.712.569.349 1.157.067.458-.221 3.49-2.035 4.808-3.529C21.782 17.653 24 14.27 24 10.304zm-14.887 2.126H6.602c-.512 0-.927-.415-.927-.927s.415-.927.927-.927h2.511c.512 0 .927.415.927.927s-.415.927-.927.927zm5.552 0h-2.511c-.512 0-.927-.415-.927-.927s.415-.927.927-.927h2.511c.512 0 .927.415.927.927s-.415.927-.927.927zm5.552 0h-2.511c-.512 0-.927-.415-.927-.927s.415-.927.927-.927h2.511c.512 0 .927.415.927.927s-.415.927-.927.927z"/></svg>
+                    前往聊天室上傳報告
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        // LIFF 初始化與 UID 抓取
+        // LIFF 初始化
         async function initializeLiff() {
             try {
                 await liff.init({ liffId: "2009597152-9nSswjnk" }); 
-                if (liff.isLoggedIn()) {
-                    const profile = await liff.getProfile();
-                    document.getElementById('lineUidInput').value = profile.userId;
-                    document.querySelector('input[name="customerName"]').value = profile.displayName + " (實戰用戶)";
-                }
             } catch (err) { console.error("LIFF Error", err); }
         }
         initializeLiff();
 
-        // 畫面切換邏輯 (控制 4 個獨立畫面的顯示與隱藏)
+        // 畫面切換邏輯
         function switchScreen(targetId) {
             ['screen-auth-demo', 'screen-dashboard', 'screen-auth-real', 'screen-upload'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
@@ -205,12 +159,52 @@
             document.getElementById(targetId).classList.remove('hidden');
             document.getElementById(targetId).classList.add('block');
             
-            // 只有進入 Dashboard 時才渲染圖表
             if (targetId === 'screen-dashboard') { 
                 initPremiumLineChart(); 
                 initRadarChart();
             }
             window.scrollTo(0, 0);
+        }
+
+        // 🛡️ 實戰技巧：身分證防呆驗證邏輯 (解決圖 1)
+        function validateRealId() {
+            const idInput = document.getElementById('realIdInput').value.trim().toUpperCase();
+            const errorMsg = document.getElementById('idErrorMsg');
+            
+            // 正規表達式：第一碼大寫英文字母，後面 9 碼數字 (台灣身分證基本格式)
+            const idRegex = /^[A-Z][1-2]\d{8}$/;
+
+            if (idRegex.test(idInput)) {
+                // 驗證通過
+                errorMsg.classList.add('hidden');
+                document.getElementById('displayVerifiedId').innerText = "已綁定 ID: " + idInput;
+                switchScreen('screen-upload'); // 進入引導畫面
+            } else {
+                // 驗證失敗，顯示錯誤訊息
+                errorMsg.classList.remove('hidden');
+                document.getElementById('realIdInput').classList.add('border-red-500');
+            }
+        }
+
+        // 📲 LINE 原生上傳魔法 (解決圖 2, 3, 4, 5, 6)
+        async function sendLineMessageAndClose() {
+            const idInput = document.getElementById('realIdInput').value.trim().toUpperCase();
+            try {
+                if (liff.isInClient()) {
+                    // 自動用客戶的帳號發送這段文字給官方帳號
+                    await liff.sendMessages([{
+                        type: 'text',
+                        text: `【啟動報告解析】\n我的身分證字號：${idInput}\n\n我已經準備好上傳報告了！`
+                    }]);
+                    // 發送完立刻關閉網頁，回到聊天室
+                    liff.closeWindow();
+                } else {
+                    alert('系統提醒：請在 LINE 手機 App 中開啟此功能，以進行報告上傳。');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('連線稍有延遲，請確認網路狀態後再試一次。');
+            }
         }
 
         // --- 以下為圖表渲染邏輯 (保持不變) ---
@@ -221,21 +215,8 @@
             Chart.defaults.color = '#94a3b8';
             new Chart(ctxRadar, {
                 type: 'radar',
-                data: {
-                    labels: ['體重', '代謝', '睡眠', '壓力', '運動', '心血管'],
-                    datasets: [{
-                        label: '健康維度分數',
-                        data: [80, 95, 85, 70, 90, 88],
-                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                        borderColor: 'rgba(59, 130, 246, 1)',
-                        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-                    scales: { r: { min: 0, max: 100, ticks: { display: false }, grid: { color: 'rgba(255, 255, 255, 0.05)' }, angleLines: { color: 'rgba(255, 255, 255, 0.05)' }, pointLabels: { font: { size: 10 } } } }
-                }
+                data: { labels: ['體重', '代謝', '睡眠', '壓力', '運動', '心血管'], datasets: [{ label: '分數', data: [80, 95, 85, 70, 90, 88], backgroundColor: 'rgba(59, 130, 246, 0.2)', borderColor: 'rgba(59, 130, 246, 1)', pointBackgroundColor: 'rgba(59, 130, 246, 1)', borderWidth: 2 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { min: 0, max: 100, ticks: { display: false }, grid: { color: 'rgba(255, 255, 255, 0.05)' }, angleLines: { color: 'rgba(255, 255, 255, 0.05)' }, pointLabels: { font: { size: 10 } } } } }
             });
             isRadarChartRendered = true;
         }
@@ -245,36 +226,14 @@
             if (isLineChartRendered) return;
             const ctxLine = document.getElementById('premiumLineChart').getContext('2d');
             let gradientLine = ctxLine.createLinearGradient(0, 0, 0, 200);
-            gradientLine.addColorStop(0, 'rgba(45, 212, 191, 0.5)');
-            gradientLine.addColorStop(1, 'rgba(45, 212, 191, 0.0)');
-
+            gradientLine.addColorStop(0, 'rgba(45, 212, 191, 0.5)'); gradientLine.addColorStop(1, 'rgba(45, 212, 191, 0.0)');
             new Chart(ctxLine, {
                 type: 'line',
-                data: {
-                    labels: ['2024', '2025', '2026'],
-                    datasets: [{
-                        label: '空腹血糖 (mg/dL)',
-                        data: [108, 102, 95],
-                        borderColor: '#2DD4BF', backgroundColor: gradientLine, borderWidth: 3, pointBackgroundColor: '#0B1120', pointBorderColor: '#2DD4BF', pointBorderWidth: 2, pointRadius: 5, fill: true, tension: 0.4 
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
-                    scales: { x: { grid: { display: false, drawBorder: false } }, y: { grid: { color: 'rgba(255, 255, 255, 0.05)', borderDash: [5, 5] }, min: 80, max: 120 } }
-                }
+                data: { labels: ['2024', '2025', '2026'], datasets: [{ label: '空腹血糖', data: [108, 102, 95], borderColor: '#2DD4BF', backgroundColor: gradientLine, borderWidth: 3, pointBackgroundColor: '#0B1120', pointBorderColor: '#2DD4BF', pointBorderWidth: 2, pointRadius: 5, fill: true, tension: 0.4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } }, scales: { x: { grid: { display: false, drawBorder: false } }, y: { grid: { color: 'rgba(255, 255, 255, 0.05)', borderDash: [5, 5] }, min: 80, max: 120 } } }
             });
             isLineChartRendered = true;
         }
-
-        // 表單提交按鈕防呆回饋
-        const form = document.getElementById('uploadForm');
-        form.addEventListener('submit', function(e) {
-            const button = form.querySelector('button');
-            button.disabled = true;
-            button.innerHTML = "資料加密上傳中，請稍候...";
-            button.classList.remove('bg-gradient-to-r', 'from-teal-500', 'to-blue-600');
-            button.classList.add('bg-slate-700');
-        });
     </script>
 </body>
 </html>
