@@ -22,49 +22,29 @@
 </head>
 <body class="flex justify-center items-center min-h-screen">
 
-    <div class="w-full max-w-md bg-[#0B1120] min-h-screen relative overflow-x-hidden overflow-y-auto no-scrollbar pb-24">
+    <div class="w-full max-w-md bg-[#0B1120] min-h-screen relative overflow-x-hidden overflow-y-auto no-scrollbar pb-16">
         
         <div class="absolute top-0 left-0 w-full h-96 bg-blue-900/20 rounded-full blur-3xl -translate-y-1/2 pointer-events-none"></div>
 
-        <div id="screen-landing" class="hidden px-6 pt-12 relative z-10">
-            <div class="text-center mb-10">
+        <div id="screen-auth-demo" class="block h-screen flex flex-col justify-center px-6 relative z-10">
+            <div class="text-center mb-8">
                 <p class="text-teal-400 text-sm font-semibold tracking-widest mb-2">YUANXIN HEALTHCARE</p>
-                <h1 class="text-4xl font-bold text-white tracking-wide mb-3">AI 深度解析報告</h1>
-                <p class="text-slate-400 text-sm">數據驅動，為您預見未來的健康樣貌</p>
+                <h1 class="text-3xl font-bold text-white tracking-wide">AI 深度解析系統</h1>
             </div>
-            <div class="glass-card rounded-3xl p-8 relative flex flex-col items-center justify-center">
-                <div class="absolute top-4 right-5 text-xs font-bold text-teal-300 border border-teal-300/30 px-2 py-1 rounded-md">DEMO</div>
-                <h2 class="text-slate-300 text-sm tracking-widest mb-6">綜合健康評級</h2>
-                <div class="relative w-40 h-40 rounded-full flex items-center justify-center border-4 border-slate-700 shadow-[0_0_30px_rgba(45,212,191,0.2)]">
-                    <div class="absolute inset-0 rounded-full border-4 border-t-teal-400 border-r-blue-500 border-b-transparent border-l-transparent transform rotate-45"></div>
-                    <div class="text-center">
-                        <span class="text-6xl font-black text-white">90</span>
-                        <span class="text-teal-400 font-bold ml-1">A+</span>
-                    </div>
-                </div>
-                <p class="text-slate-400 text-xs mt-6 text-center leading-relaxed">您的生理機能狀態極佳<br>優於同齡群體 <span class="text-teal-400 font-bold">85%</span></p>
-            </div>
-            <div class="fixed bottom-0 left-0 w-full flex justify-center pb-8 pt-12 bg-gradient-to-t from-[#0B1120] via-[#0B1120] to-transparent z-50">
-                <button onclick="switchScreen('screen-auth')" class="w-[85%] max-w-sm bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold py-4 px-6 rounded-2xl shadow-[0_10px_25px_-5px_rgba(45,212,191,0.4)]">
-                    查看專屬解析報告
-                </button>
-            </div>
-        </div>
-
-        <div id="screen-auth" class="hidden h-screen flex flex-col justify-center px-6 relative z-10">
             <div class="glass-card rounded-3xl p-8 border-t border-white/10">
-                <h2 class="text-2xl font-bold text-white mb-2">身分安全驗證</h2>
+                <div class="absolute top-4 right-5 text-xs font-bold text-teal-300 border border-teal-300/30 px-2 py-1 rounded-md">DEMO體驗</div>
+                <h2 class="text-2xl font-bold text-white mb-2 mt-4">身分安全驗證</h2>
                 <p class="text-slate-400 text-sm mb-8">為保護您的醫療隱私，請輸入驗證資訊</p>
                 <div class="mb-5">
                     <label class="block text-slate-300 text-xs font-bold mb-2 tracking-wider">身分證字號</label>
                     <input class="w-full bg-slate-800/50 border border-slate-600 text-white rounded-xl py-3 px-4 focus:outline-none focus:border-teal-400" type="text" placeholder="請輸入身分證字號 (Demo版免輸入)">
                 </div>
                 <button onclick="switchScreen('screen-dashboard')" class="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg mt-4">安全登入</button>
-                <p class="text-center text-red-400 text-[10px] mt-2 font-bold tracking-tight">&lt;此報告為DEMO版請直接點選「安全登入」體驗&gt;</p>
+                <p class="text-center text-red-400 text-[10px] mt-3 font-bold tracking-tight">&lt;此報告為DEMO版請直接點選「安全登入」體驗&gt;</p>
             </div>
         </div>
 
-        <div id="screen-dashboard" class="block px-5 pt-10 relative z-10">
+        <div id="screen-dashboard" class="hidden px-5 pt-10 relative z-10">
             <div class="flex justify-between items-end mb-8 pl-2">
                 <div>
                     <h2 class="text-2xl font-bold text-white tracking-wide">陳曉君 <span class="text-sm text-slate-400 font-normal">女士</span></h2>
@@ -73,30 +53,6 @@
                 <div class="w-12 h-12 rounded-full border border-teal-400 flex items-center justify-center bg-teal-400/10 shadow-[0_0_15px_rgba(45,212,191,0.2)]">
                     <span class="text-xl font-bold text-teal-300">82</span>
                 </div>
-            </div>
-
-            <div class="glass-card rounded-2xl p-5 mb-8 border border-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.1)]">
-                <div class="flex items-center gap-2 mb-3">
-                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    <h3 class="text-white font-bold text-base tracking-wide">上傳您的真實健檢報告</h3>
-                </div>
-                <p class="text-slate-300 text-[11px] mb-4 leading-relaxed bg-amber-950/30 p-2.5 rounded-lg border border-amber-800">
-                    <strong class="text-amber-300">防呆與流程提示：</strong>本系統初期採用「人機協同」解析。您上傳的照片將透過 SSL 加密技術安全傳送至醫療分析小組，預計於<strong class="text-amber-300">一個工作天後</strong>產出深度報告並 LINE 通知您。此處 Demo 數據將在解析完成後更新為您的真實結果。
-                </p>
-                
-                <form id="uploadForm" action="https://formspree.io/f/xeepqlok" method="POST" enctype="multipart/form-data" class="space-y-3">
-                    <input type="hidden" name="_subject" value="【元馨報告上傳】新的客戶報告來信">
-                    <input type="hidden" id="lineUidInput" name="lineUid" value="UID: 1982***34">
-                    <input type="hidden" name="customerName" value="吳惠君 Demo用戶">
-
-                    <label class="block text-xs text-slate-300 font-bold tracking-widest mb-1.5">1. 選擇報告照片 (清晰且光源充足)</label>
-                    <input type="file" name="upload" accept="image/*" class="w-full text-xs text-slate-300 bg-slate-800/60 rounded-xl px-4 py-2.5 border border-slate-700/50" required>
-                    
-                    <label class="block text-xs text-slate-300 font-bold tracking-widest mb-1.5 pt-1.5">2. 安全驗證後上傳</label>
-                    <button type="submit" class="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold py-3 px-4 rounded-xl text-xs shadow-md">
-                        安全上傳我的健檢報告
-                    </button>
-                </form>
             </div>
 
             <div class="grid grid-cols-2 gap-4 mb-6">
@@ -150,20 +106,6 @@
                 </div>
             </div>
 
-            <div class="glass-card p-5 rounded-3xl mb-8 border border-teal-500/20 shadow-[0_0_20px_rgba(45,212,191,0.1)]">
-                <p class="text-[10px] text-teal-400 font-bold mb-2 tracking-widest text-center">與您的代謝處方相容 (Marketplace Demo)</p>
-                <div class="flex gap-4 items-center">
-                    <div class="w-16 h-16 rounded-xl bg-slate-700/50 flex items-center justify-center border border-slate-600/50 text-3xl">🐟</div>
-                    <div class="flex-1">
-                        <h3 class="text-white font-extrabold text-base mb-1">極地純淨 Omega-3 魚油</h3>
-                        <p class="text-slate-400 text-[10px] leading-snug">高濃度脂肪酸，精準介入代謝與腸道修復軸，提升 HDL-C。</p>
-                    </div>
-                </div>
-                <button class="w-full mt-5 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-colors border border-slate-600">
-                    查看 Marketplace 商品詳情 (Demo Only)
-                </button>
-            </div>
-
             <div class="glass-card p-5 rounded-3xl mb-12">
                 <h3 class="text-white font-bold text-sm mb-4 pl-2 tracking-wide">🧠 全面維度分析 (功能醫學視角)</h3>
                 <div class="w-full h-56">
@@ -171,17 +113,80 @@
                 </div>
             </div>
 
+            <div class="mt-8 mb-6 border-t border-slate-700 pt-8">
+                <p class="text-center text-slate-400 text-xs mb-4">想要獲得如上方般精準的專屬報告嗎？</p>
+                <button onclick="switchScreen('screen-auth-real')" class="w-full bg-transparent border-2 border-red-500/80 text-red-400 font-bold py-3.5 px-4 rounded-xl shadow-[0_0_15px_rgba(239,68,68,0.15)] hover:bg-red-500/10 transition-colors flex justify-center items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    上傳您的真實健檢報告
+                </button>
+            </div>
+
             <div class="text-center pb-8">
-                <button onclick="switchScreen('screen-landing')" class="text-slate-500 hover:text-slate-300 text-xs font-bold underline">返回首頁</button>
+                <button onclick="switchScreen('screen-auth-demo')" class="text-slate-500 hover:text-slate-300 text-xs font-bold underline">返回首頁</button>
+            </div>
+        </div>
+
+        <div id="screen-auth-real" class="hidden h-screen flex flex-col justify-center px-6 relative z-10">
+            <div class="glass-card rounded-3xl p-8 border-t border-teal-500/30 shadow-[0_0_30px_rgba(45,212,191,0.1)]">
+                <div class="absolute top-4 right-5 text-xs font-bold text-amber-500 border border-amber-500/30 px-2 py-1 rounded-md bg-amber-500/10">正式解析</div>
+                <h2 class="text-2xl font-bold text-white mb-2 mt-4">身分安全驗證</h2>
+                <p class="text-slate-400 text-sm mb-8">為保護您的醫療隱私，請輸入您的真實身分證字號，以建立加密健康檔案。</p>
+                <div class="mb-5">
+                    <label class="block text-slate-300 text-xs font-bold mb-2 tracking-wider">真實身分證字號</label>
+                    <input class="w-full bg-slate-800 border border-slate-600 text-white rounded-xl py-3 px-4 focus:outline-none focus:border-teal-400" type="text" placeholder="請輸入身分證字號">
+                </div>
+                <button onclick="switchScreen('screen-upload')" class="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg mt-4">安全登入</button>
+            </div>
+            <div class="text-center mt-6">
+                <button onclick="switchScreen('screen-dashboard')" class="text-slate-500 hover:text-slate-300 text-xs font-bold underline">返回 Demo 報告</button>
+            </div>
+        </div>
+
+        <div id="screen-upload" class="hidden px-5 pt-12 relative z-10 min-h-screen flex flex-col">
+            <div class="glass-card rounded-2xl p-6 mb-8 border border-amber-500/30 shadow-[0_0_20px_rgba(245,158,11,0.15)] flex-1">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-amber-500/20 flex items-center justify-center text-amber-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                    </div>
+                    <h3 class="text-white font-bold text-lg tracking-wide">上傳真實報告</h3>
+                </div>
+                
+                <p class="text-slate-300 text-xs mb-6 leading-relaxed bg-amber-950/40 p-3.5 rounded-lg border border-amber-800/50">
+                    <strong class="text-amber-400 block mb-1">🛡️ 醫療級資安承諾：</strong>
+                    您上傳的照片將透過 SSL 加密技術安全傳送至醫療分析小組。系統預計於<strong class="text-amber-400">一個工作天後</strong>產出深度解析報告，並透過 LINE 官方帳號推播通知您。
+                </p>
+                
+                <form id="uploadForm" action="https://formspree.io/f/xeepqlok" method="POST" enctype="multipart/form-data" class="space-y-5">
+                    <input type="hidden" name="_subject" value="【元馨報告上傳】新的客戶報告來信">
+                    <input type="hidden" id="lineUidInput" name="lineUid" value="UID: 待抓取">
+                    <input type="hidden" name="customerName" value="實戰用戶上傳">
+
+                    <div>
+                        <label class="block text-sm text-slate-200 font-bold tracking-widest mb-2">1. 選擇報告照片</label>
+                        <p class="text-[10px] text-slate-500 mb-2">請確保文字清晰、無嚴重反光</p>
+                        <input type="file" name="upload" accept="image/*" class="w-full text-sm text-slate-300 bg-slate-800/80 rounded-xl px-4 py-3 border border-slate-600 focus:border-teal-500 outline-none" required>
+                    </div>
+                    
+                    <div class="pt-4 border-t border-slate-700/50">
+                        <label class="block text-sm text-slate-200 font-bold tracking-widest mb-3">2. 確認無誤後送出</label>
+                        <button type="submit" class="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold py-4 px-4 rounded-xl text-sm shadow-lg hover:shadow-teal-500/25 transition-all">
+                            安全上傳我的健檢報告
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="text-center pb-8 mt-auto">
+                <button onclick="switchScreen('screen-auth-demo')" class="text-slate-500 hover:text-slate-300 text-sm font-bold underline tracking-wider">返回首頁</button>
             </div>
         </div>
     </div>
 
     <script>
+        // LIFF 初始化與 UID 抓取
         async function initializeLiff() {
             try {
                 await liff.init({ liffId: "2009597152-9nSswjnk" }); 
-                
                 if (liff.isLoggedIn()) {
                     const profile = await liff.getProfile();
                     document.getElementById('lineUidInput').value = profile.userId;
@@ -191,14 +196,16 @@
         }
         initializeLiff();
 
+        // 畫面切換邏輯 (控制 4 個獨立畫面的顯示與隱藏)
         function switchScreen(targetId) {
-            ['screen-landing', 'screen-auth', 'screen-dashboard'].forEach(id => {
+            ['screen-auth-demo', 'screen-dashboard', 'screen-auth-real', 'screen-upload'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
                 document.getElementById(id).classList.remove('block');
             });
             document.getElementById(targetId).classList.remove('hidden');
             document.getElementById(targetId).classList.add('block');
             
+            // 只有進入 Dashboard 時才渲染圖表
             if (targetId === 'screen-dashboard') { 
                 initPremiumLineChart(); 
                 initRadarChart();
@@ -206,6 +213,7 @@
             window.scrollTo(0, 0);
         }
 
+        // --- 以下為圖表渲染邏輯 (保持不變) ---
         let isRadarChartRendered = false;
         function initRadarChart() {
             if (isRadarChartRendered) return;
@@ -225,14 +233,8 @@
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        r: {
-                            min: 0, max: 100, ticks: { display: false }, grid: { color: 'rgba(255, 255, 255, 0.05)' }, angleLines: { color: 'rgba(255, 255, 255, 0.05)' }, pointLabels: { font: { size: 10 } }
-                        }
-                    }
+                    responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                    scales: { r: { min: 0, max: 100, ticks: { display: false }, grid: { color: 'rgba(255, 255, 255, 0.05)' }, angleLines: { color: 'rgba(255, 255, 255, 0.05)' }, pointLabels: { font: { size: 10 } } } }
                 }
             });
             isRadarChartRendered = true;
@@ -253,30 +255,23 @@
                     datasets: [{
                         label: '空腹血糖 (mg/dL)',
                         data: [108, 102, 95],
-                        borderColor: '#2DD4BF',
-                        backgroundColor: gradientLine,
-                        borderWidth: 3, pointBackgroundColor: '#0B1120', pointBorderColor: '#2DD4BF', pointBorderWidth: 2, pointRadius: 5, fill: true, tension: 0.4 
+                        borderColor: '#2DD4BF', backgroundColor: gradientLine, borderWidth: 3, pointBackgroundColor: '#0B1120', pointBorderColor: '#2DD4BF', pointBorderWidth: 2, pointRadius: 5, fill: true, tension: 0.4 
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
-                    scales: {
-                        x: { grid: { display: false, drawBorder: false } },
-                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)', borderDash: [5, 5] }, min: 80, max: 120 }
-                    }
+                    responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+                    scales: { x: { grid: { display: false, drawBorder: false } }, y: { grid: { color: 'rgba(255, 255, 255, 0.05)', borderDash: [5, 5] }, min: 80, max: 120 } }
                 }
             });
             isLineChartRendered = true;
         }
 
-        // 實戰技巧：當表單提交時，提供一個優雅的反饋
+        // 表單提交按鈕防呆回饋
         const form = document.getElementById('uploadForm');
         form.addEventListener('submit', function(e) {
             const button = form.querySelector('button');
             button.disabled = true;
-            button.innerHTML = "正在安全上傳中，請稍候...";
+            button.innerHTML = "資料加密上傳中，請稍候...";
             button.classList.remove('bg-gradient-to-r', 'from-teal-500', 'to-blue-600');
             button.classList.add('bg-slate-700');
         });
