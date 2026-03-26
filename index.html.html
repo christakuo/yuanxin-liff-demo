@@ -130,7 +130,7 @@
                 <p class="text-slate-300 text-sm mb-8 leading-relaxed bg-slate-800/80 p-4 rounded-xl text-left border border-slate-700">
                     <strong class="text-white block mb-2">📥 下一步：上傳報告</strong>
                     為支援多頁、高畫質圖檔及 PDF 格式，我們將採用 LINE 官方加密聊天室為您進行傳輸。<br><br>
-                    請點擊下方按鈕，系統將自動為您向醫管家發送建檔指令，您即可在聊天室中**一次選取多張照片或檔案**進行上傳。
+                    請點擊下方按鈕，系統將自動為您向醫管家發送建檔指令，您即可在聊天室中直接上傳。
                 </p>
                 
                 <button onclick="sendLineMessageAndClose()" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-4 px-4 rounded-xl text-base shadow-lg transition-all flex items-center justify-center gap-2">
@@ -142,7 +142,6 @@
     </div>
 
     <script>
-        // LIFF 初始化
         async function initializeLiff() {
             try {
                 await liff.init({ liffId: "2009597152-9nSswjnk" }); 
@@ -150,7 +149,6 @@
         }
         initializeLiff();
 
-        // 畫面切換邏輯
         function switchScreen(targetId) {
             ['screen-auth-demo', 'screen-dashboard', 'screen-auth-real', 'screen-upload'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
@@ -166,37 +164,30 @@
             window.scrollTo(0, 0);
         }
 
-        // 🛡️ 實戰技巧：身分證防呆驗證邏輯 (解決圖 1)
         function validateRealId() {
             const idInput = document.getElementById('realIdInput').value.trim().toUpperCase();
             const errorMsg = document.getElementById('idErrorMsg');
-            
-            // 正規表達式：第一碼大寫英文字母，後面 9 碼數字 (台灣身分證基本格式)
             const idRegex = /^[A-Z][1-2]\d{8}$/;
 
             if (idRegex.test(idInput)) {
-                // 驗證通過
                 errorMsg.classList.add('hidden');
                 document.getElementById('displayVerifiedId').innerText = "已綁定 ID: " + idInput;
-                switchScreen('screen-upload'); // 進入引導畫面
+                switchScreen('screen-upload'); 
             } else {
-                // 驗證失敗，顯示錯誤訊息
                 errorMsg.classList.remove('hidden');
                 document.getElementById('realIdInput').classList.add('border-red-500');
             }
         }
 
-        // 📲 LINE 原生上傳魔法 (解決圖 2, 3, 4, 5, 6)
+        // 📲 LINE 原生上傳魔法 (已更新終極防呆文案)
         async function sendLineMessageAndClose() {
             const idInput = document.getElementById('realIdInput').value.trim().toUpperCase();
             try {
                 if (liff.isInClient()) {
-                    // 自動用客戶的帳號發送這段文字給官方帳號
                     await liff.sendMessages([{
                         type: 'text',
-                        text: `【啟動報告解析】\n我的身分證字號：${idInput}\n\n我已經準備好上傳報告了！`
+                        text: `【建立專屬健康檔案】\n我的身分證字號：${idInput}\n\n(本訊息為系統自動代發)\n👇 請直接在此對話框，開始上傳您的健檢報告！\n\n💡 上傳教學：\n請點擊螢幕左下角的「＋」號：\n1. 若是紙本：請點選「拍照」或「相簿」\n2. 若是電子檔：請點選「檔案」(支援 PDF)\n\n上傳完成後，專屬顧問將盡快為您解析。`
                     }]);
-                    // 發送完立刻關閉網頁，回到聊天室
                     liff.closeWindow();
                 } else {
                     alert('系統提醒：請在 LINE 手機 App 中開啟此功能，以進行報告上傳。');
@@ -207,7 +198,7 @@
             }
         }
 
-        // --- 以下為圖表渲染邏輯 (保持不變) ---
+        // --- 以下為圖表渲染邏輯 ---
         let isRadarChartRendered = false;
         function initRadarChart() {
             if (isRadarChartRendered) return;
