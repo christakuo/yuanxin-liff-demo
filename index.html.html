@@ -18,11 +18,6 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
-        .text-gradient {
-            background: linear-gradient(135deg, #2DD4BF 0%, #3B82F6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
     </style>
 </head>
 <body class="flex justify-center items-center min-h-screen">
@@ -65,21 +60,43 @@
                     <input class="w-full bg-slate-800/50 border border-slate-600 text-white rounded-xl py-3 px-4 focus:outline-none focus:border-teal-400" type="text" placeholder="請輸入身分證字號 (Demo版免輸入)">
                 </div>
                 <button onclick="switchScreen('screen-dashboard')" class="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg mt-4">安全登入</button>
-                <p class="text-center text-red-400 text-[10px] mt-2 font-bold tracking-tight">
-                    &lt;此報告為DEMO版請直接點選「安全登入」體驗&gt;
-                </p>
+                <p class="text-center text-red-400 text-[10px] mt-2 font-bold tracking-tight">&lt;此報告為DEMO版請直接點選「安全登入」體驗&gt;</p>
             </div>
         </div>
 
         <div id="screen-dashboard" class="block px-5 pt-10 relative z-10">
             <div class="flex justify-between items-end mb-8 pl-2">
                 <div>
-                    <h2 class="text-2xl font-bold text-white tracking-wide">吳惠君 <span class="text-sm text-slate-400 font-normal">女士</span></h2>
+                    <h2 class="text-2xl font-bold text-white tracking-wide">陳曉君 <span class="text-sm text-slate-400 font-normal">女士</span></h2>
                     <p class="text-xs text-teal-400 mt-1">深度解析完成 (2026/03)</p>
                 </div>
                 <div class="w-12 h-12 rounded-full border border-teal-400 flex items-center justify-center bg-teal-400/10 shadow-[0_0_15px_rgba(45,212,191,0.2)]">
                     <span class="text-xl font-bold text-teal-300">82</span>
                 </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5 mb-8 border border-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.1)]">
+                <div class="flex items-center gap-2 mb-3">
+                    <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    <h3 class="text-white font-bold text-base tracking-wide">上傳您的真實健檢報告</h3>
+                </div>
+                <p class="text-slate-300 text-[11px] mb-4 leading-relaxed bg-amber-950/30 p-2.5 rounded-lg border border-amber-800">
+                    <strong class="text-amber-300">防呆與流程提示：</strong>本系統初期採用「人機協同」解析。您上傳的照片將透過 SSL 加密技術安全傳送至醫療分析小組，預計於<strong class="text-amber-300">一個工作天後</strong>產出深度報告並 LINE 通知您。此處 Demo 數據將在解析完成後更新為您的真實結果。
+                </p>
+                
+                <form id="uploadForm" action="https://formspree.io/f/xeepqlok" method="POST" enctype="multipart/form-data" class="space-y-3">
+                    <input type="hidden" name="_subject" value="【元馨報告上傳】新的客戶報告來信">
+                    <input type="hidden" id="lineUidInput" name="lineUid" value="UID: 1982***34">
+                    <input type="hidden" name="customerName" value="吳惠君 Demo用戶">
+
+                    <label class="block text-xs text-slate-300 font-bold tracking-widest mb-1.5">1. 選擇報告照片 (清晰且光源充足)</label>
+                    <input type="file" name="upload" accept="image/*" class="w-full text-xs text-slate-300 bg-slate-800/60 rounded-xl px-4 py-2.5 border border-slate-700/50" required>
+                    
+                    <label class="block text-xs text-slate-300 font-bold tracking-widest mb-1.5 pt-1.5">2. 安全驗證後上傳</label>
+                    <button type="submit" class="w-full bg-gradient-to-r from-teal-500 to-blue-600 text-white font-bold py-3 px-4 rounded-xl text-xs shadow-md">
+                        安全上傳我的健檢報告
+                    </button>
+                </form>
             </div>
 
             <div class="grid grid-cols-2 gap-4 mb-6">
@@ -117,46 +134,29 @@
 
             <h3 class="text-white font-bold text-sm mb-4 pl-2 tracking-wide">🎯 精準生活處方</h3>
             <div class="space-y-4 mb-8">
-                
                 <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4">
                     <h4 class="text-teal-400 font-bold text-[13px] mb-2">🥗 1. 營養與腸道微生態重建</h4>
                     <ul class="text-slate-300 text-[12px] space-y-2 list-none">
-                        <li class="flex gap-2">
-                            <span class="text-teal-500">•</span>
-                            <span><strong class="text-white">碳水後置法：</strong>用餐先吃蛋白質與蔬菜，最後吃澱粉，延緩腸道吸收糖分，減少胰島素過度分泌。</span>
-                        </li>
-                        <li class="flex gap-2">
-                            <span class="text-teal-500">•</span>
-                            <span><strong class="text-white">抗發炎好油介入：</strong>每週 3 次深海魚類，補充 Omega-3 提升 HDL-C 並修復腸道黏膜。</span>
-                        </li>
+                        <li class="flex gap-2"><span class="text-teal-500">•</span><span><strong class="text-white">碳水後置法：</strong>用餐先吃蛋白質與蔬菜，最後吃澱粉，延緩腸道吸收糖分。</span></li>
+                        <li class="flex gap-2"><span class="text-teal-500">•</span><span><strong class="text-white">抗發炎好油介入：</strong>每週 3 次深海魚類，補充 Omega-3 修復腸道黏膜。</span></li>
                     </ul>
                 </div>
-
                 <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4">
                     <h4 class="text-teal-400 font-bold text-[13px] mb-2">🏃‍♀️ 2. 細胞粒線體優化運動</h4>
                     <ul class="text-slate-300 text-[12px] space-y-2 list-none">
-                        <li class="flex gap-2">
-                            <span class="text-teal-500">•</span>
-                            <span><strong class="text-white">Zone 2 有氧：</strong>每週 3 次、每次 40 分鐘超慢跑，有效提升好膽固醇並增加燃脂效率。</span>
-                        </li>
-                        <li class="flex gap-2">
-                            <span class="text-teal-500">•</span>
-                            <span><strong class="text-white">阻力訓練：</strong>肌肉是最大的血糖儲藏室。每週 2 次下肢訓練（如深蹲）能像海綿般吸走多餘糖分。</span>
-                        </li>
+                        <li class="flex gap-2"><span class="text-teal-500">•</span><span><strong class="text-white">Zone 2 有氧：</strong>每週 3 次、每次 40 分鐘超慢跑，提升好膽固醇並增加燃脂效率。</span></li>
+                        <li class="flex gap-2"><span class="text-teal-500">•</span><span><strong class="text-white">阻力訓練：</strong>肌肉是最大的血糖儲藏室。每週 2 次下肢訓練（如深蹲）能吸走多餘糖分。</span></li>
                     </ul>
                 </div>
-
             </div>
 
             <div class="glass-card p-5 rounded-3xl mb-8 border border-teal-500/20 shadow-[0_0_20px_rgba(45,212,191,0.1)]">
                 <p class="text-[10px] text-teal-400 font-bold mb-2 tracking-widest text-center">與您的代謝處方相容 (Marketplace Demo)</p>
                 <div class="flex gap-4 items-center">
-                    <div class="w-16 h-16 rounded-xl bg-slate-700/50 flex items-center justify-center border border-slate-600/50">
-                        <svg class="w-8 h-8 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 11-3-3 3 3 0 013 3z"></path></svg>
-                    </div>
+                    <div class="w-16 h-16 rounded-xl bg-slate-700/50 flex items-center justify-center border border-slate-600/50 text-3xl">🐟</div>
                     <div class="flex-1">
-                        <h3 class="text-white font-extrabold text-base mb-1">元馨嚴選：極地純淨 Omega-3 魚油</h3>
-                        <p class="text-slate-400 text-[10px] leading-snug">高濃度抗發炎脂肪酸，精準介入代謝與腸道修復軸，幫助提升 HDL-C 指標。</p>
+                        <h3 class="text-white font-extrabold text-base mb-1">極地純淨 Omega-3 魚油</h3>
+                        <p class="text-slate-400 text-[10px] leading-snug">高濃度脂肪酸，精準介入代謝與腸道修復軸，提升 HDL-C。</p>
                     </div>
                 </div>
                 <button class="w-full mt-5 bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-colors border border-slate-600">
@@ -180,8 +180,13 @@
     <script>
         async function initializeLiff() {
             try {
-                // 保留你的 LIFF ID
                 await liff.init({ liffId: "2009597152-9nSswjnk" }); 
+                
+                if (liff.isLoggedIn()) {
+                    const profile = await liff.getProfile();
+                    document.getElementById('lineUidInput').value = profile.userId;
+                    document.querySelector('input[name="customerName"]').value = profile.displayName + " (實戰用戶)";
+                }
             } catch (err) { console.error("LIFF Error", err); }
         }
         initializeLiff();
@@ -205,6 +210,7 @@
         function initRadarChart() {
             if (isRadarChartRendered) return;
             const ctxRadar = document.getElementById('demoRadarChart').getContext('2d');
+            Chart.defaults.color = '#94a3b8';
             new Chart(ctxRadar, {
                 type: 'radar',
                 data: {
@@ -224,12 +230,7 @@
                     plugins: { legend: { display: false } },
                     scales: {
                         r: {
-                            min: 0,
-                            max: 100,
-                            ticks: { display: false },
-                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                            angleLines: { color: 'rgba(255, 255, 255, 0.05)' },
-                            pointLabels: { color: '#94a3b8', font: { size: 10 } }
+                            min: 0, max: 100, ticks: { display: false }, grid: { color: 'rgba(255, 255, 255, 0.05)' }, angleLines: { color: 'rgba(255, 255, 255, 0.05)' }, pointLabels: { font: { size: 10 } }
                         }
                     }
                 }
@@ -241,9 +242,8 @@
         function initPremiumLineChart() {
             if (isLineChartRendered) return;
             const ctxLine = document.getElementById('premiumLineChart').getContext('2d');
-            
             let gradientLine = ctxLine.createLinearGradient(0, 0, 0, 200);
-            gradientLine.addColorStop(0, 'rgba(45, 212, 191, 0.5)'); // Teal
+            gradientLine.addColorStop(0, 'rgba(45, 212, 191, 0.5)');
             gradientLine.addColorStop(1, 'rgba(45, 212, 191, 0.0)');
 
             new Chart(ctxLine, {
@@ -252,22 +252,16 @@
                     labels: ['2024', '2025', '2026'],
                     datasets: [{
                         label: '空腹血糖 (mg/dL)',
-                        data: [108, 102, 95], // Restored premium line data
-                        borderColor: '#2DD4BF', // Teal-400
+                        data: [108, 102, 95],
+                        borderColor: '#2DD4BF',
                         backgroundColor: gradientLine,
-                        borderWidth: 3,
-                        pointBackgroundColor: '#0B1120',
-                        pointBorderColor: '#2DD4BF',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        fill: true,
-                        tension: 0.4 
+                        borderWidth: 3, pointBackgroundColor: '#0B1120', pointBorderColor: '#2DD4BF', pointBorderWidth: 2, pointRadius: 5, fill: true, tension: 0.4 
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(30, 41, 59, 0.9)', titleColor: '#fff', bodyColor: '#2DD4BF', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1 } },
+                    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
                     scales: {
                         x: { grid: { display: false, drawBorder: false } },
                         y: { grid: { color: 'rgba(255, 255, 255, 0.05)', borderDash: [5, 5] }, min: 80, max: 120 }
@@ -276,6 +270,16 @@
             });
             isLineChartRendered = true;
         }
+
+        // 實戰技巧：當表單提交時，提供一個優雅的反饋
+        const form = document.getElementById('uploadForm');
+        form.addEventListener('submit', function(e) {
+            const button = form.querySelector('button');
+            button.disabled = true;
+            button.innerHTML = "正在安全上傳中，請稍候...";
+            button.classList.remove('bg-gradient-to-r', 'from-teal-500', 'to-blue-600');
+            button.classList.add('bg-slate-700');
+        });
     </script>
 </body>
 </html>
