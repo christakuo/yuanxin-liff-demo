@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>元馨醫管家 - 內部審核指揮中心</title>
+    <title>元馨醫管家 - 內部營運工作站 (升級指令版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #F8FAFC; }
@@ -16,122 +16,124 @@
     <div class="w-64 bg-slate-900 text-slate-300 flex flex-col shadow-2xl z-20">
         <div class="p-6 border-b border-slate-700">
             <h1 class="text-xl font-bold text-teal-400 tracking-wider">元馨醫管家</h1>
-            <p class="text-xs text-slate-400 mt-1">Provider Console v1.0</p>
+            <p class="text-xs text-slate-400 mt-1">AI 輔助營運中心 v2.0</p>
         </div>
         <div class="p-4 flex-1">
-            <p class="text-xs font-bold text-slate-500 mb-4 px-2 tracking-widest">工作區</p>
+            <p class="text-xs font-bold text-slate-500 mb-4 px-2 tracking-widest">SOP 任務面板</p>
             <a href="#" class="flex items-center gap-3 bg-teal-500/10 text-teal-400 px-4 py-3 rounded-lg font-medium mb-2 border border-teal-500/20">
                 <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
-                待審核報告 (12)
+                處理中：吳惠君 (待發送)
             </a>
             <a href="#" class="flex items-center gap-3 hover:bg-slate-800 px-4 py-3 rounded-lg font-medium transition-colors mb-2">
                 客戶健康檔案庫
-            </a>
-            <a href="#" class="flex items-center gap-3 hover:bg-slate-800 px-4 py-3 rounded-lg font-medium transition-colors">
-                Marketplace 導單統計
             </a>
         </div>
         <div class="p-4 border-t border-slate-700 text-sm flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-white font-bold">I</div>
             <div>
                 <p class="text-white font-bold">Ivy (營運總監)</p>
-                <p class="text-xs text-teal-400">系統管理員</p>
+                <p class="text-xs text-teal-400">工作站啟用中</p>
             </div>
         </div>
     </div>
 
     <div class="flex-1 flex flex-col overflow-hidden">
-        
         <header class="bg-white h-16 border-b border-slate-200 flex items-center justify-between px-8 shadow-sm z-10">
             <div class="flex items-center gap-4">
-                <span class="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full border border-amber-200">狀態：等待人工放行</span>
-                <h2 class="text-lg font-bold">吳惠君 (UID: 1982***34) - 2026 年度健檢報告</h2>
-            </div>
-            <div class="text-sm text-slate-500">
-                AI 處理完成時間：2026-03-25 10:15
+                <span class="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full border border-amber-200">步驟 3 & 4：AI 解析與審核</span>
+                <h2 class="text-lg font-bold">當前任務：吳惠君 (UID: 1982***34)</h2>
             </div>
         </header>
 
         <main class="flex-1 overflow-auto custom-scrollbar p-6 bg-slate-50 flex gap-6">
             
             <div class="w-1/2 flex flex-col gap-4">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex-1 flex flex-col">
-                    <h3 class="text-sm font-bold text-slate-700 mb-3 flex justify-between items-center">
-                        <span>1. 客戶上傳原圖 (OCR 對照)</span>
-                        <span class="text-xs text-teal-600 bg-teal-50 px-2 py-1 rounded">AI 信心指數: 92%</span>
-                    </h3>
-                    <div class="flex-1 bg-slate-100 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center relative overflow-hidden group">
-                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-                        <div class="text-center">
-                            <svg class="w-12 h-12 text-slate-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            <p class="text-slate-500 font-medium text-sm">報告影像原圖 (可放大檢視)</p>
-                            <p class="text-slate-400 text-xs mt-1">系統已自動標記紅字區域</p>
-                        </div>
-                    </div>
+                <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm text-blue-800">
+                    <strong>💡 SOP 提示：</strong>請填寫下方括號中的客戶基本資料，然後點擊右上角複製指令，貼給 AI 進行深度分析。
                 </div>
 
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-                    <h3 class="text-sm font-bold text-slate-700 mb-3">2. 關鍵異常數據 (可手動覆寫)</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="p-3 bg-red-50 border border-red-100 rounded-lg flex justify-between items-center">
-                            <span class="text-sm font-bold text-slate-700">高密度膽固醇 (HDL-C)</span>
-                            <input type="number" value="42" class="w-16 text-right border border-slate-300 rounded px-2 py-1 text-red-600 font-bold focus:outline-none focus:border-teal-500">
-                        </div>
-                        <div class="p-3 bg-amber-50 border border-amber-100 rounded-lg flex justify-between items-center">
-                            <span class="text-sm font-bold text-slate-700">空腹血糖 (Glucose)</span>
-                            <input type="number" value="102" class="w-16 text-right border border-slate-300 rounded px-2 py-1 text-amber-600 font-bold focus:outline-none focus:border-teal-500">
-                        </div>
-                    </div>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex-1 flex flex-col">
+                    <h3 class="text-sm font-bold text-slate-700 mb-3 flex justify-between items-center">
+                        <span>專屬 AI 分析指令 (升級版)</span>
+                        <button onclick="copyPrompt()" class="text-xs bg-teal-500 hover:bg-teal-600 text-white shadow px-3 py-1.5 rounded font-bold transition-colors">
+                            一鍵複製指令
+                        </button>
+                    </h3>
+                    <textarea id="aiPrompt" class="w-full flex-1 border border-slate-300 rounded-lg p-3 text-sm text-slate-700 focus:outline-none focus:border-teal-500 bg-slate-50 resize-none leading-relaxed"># Role & Persona
+你現在是『元馨醫管家』專屬的高階功能醫學專家。你的語氣必須尊榮、溫暖、且具備高度專業性，讓客戶感受到被重視與被照顧。請使用繁體中文(台灣習慣用語)進行回覆。
+
+# Context & Inputs
+請根據以下系統提供的客戶資料進行深度分析：
+- 客戶性別：{請填寫性別}
+- 客戶年齡：{請填寫年齡}
+- 健檢異常項目(紅字)：{請填寫紅字項目}
+- 一分鐘專屬健康評估結果：{請填寫評估結果}
+- 參考依據：《榮總檢驗值臨床意義》及功能醫學核心理念。
+
+# Task
+請不要只是逐條解釋紅字，而是要進行「指標深度交叉分析」，找出潛在的健康根本原因(Root Cause)。請產出一份具備深度、排版清晰的專屬健康改善計畫。
+
+# Output Structure
+請嚴格按照以下 Markdown 格式輸出，確保標題清晰、重點明確：
+## 一、元馨醫管家 AI 專屬總評摘要
+(請以溫暖的口吻，針對客戶的年齡、性別與整體異常狀況，給予一段約200字的客製化整體健康關懷與重點摘要。)
+
+## 二、核心健康風險交叉分析
+(請將關聯性的異常紅字合併分析。例如：代謝問題、心血管風險、肝膽功能等。用白話文解釋這些數值異常對身體的實際影響。)
+
+## 三、全方位生活習慣處方
+(請分點條列，提供具體且可執行的建議)
+* 飲食調理：(應多吃什麼、避免什麼、為什麼要這樣吃)
+* 運動處方：(適合該年齡層與體能狀況的運動類型與頻率、這樣做的好處是什麼)
+* 睡眠與紓壓：(針對生活習慣的調整建議、具體給出完整說明)
+
+## 四、專屬保健與商城選品建議
+(基於上述分析，推薦客戶需要補充的營養素。請自然地引導客戶至『元馨醫管家商城』尋找對應的保健產品。語氣要像專業顧問的貼心建議，而非強迫推銷。)
+
+## 五、風險轉嫁與保險規劃建議
+(根據客戶目前的健康紅字與未來潛在風險，提供醫療險、重大傷病險或長照險等相關保險檢視的善意提醒，作為預防醫學的財務防線。)
+
+## 六、醫管家溫馨提醒
+(請務必包含以下免責聲明：本報告由 AI 輔助生成，旨在提供全方位的健康管理與生活型態調整建議，不具備醫療診斷效力。若有急性不適或需進一步治療，建議攜帶完整報告至醫療院所尋求專業醫師協助。)
+
+# Constraints
+1. 絕不捏造數據或給出無醫學根據的偏方。
+2. 避免使用恐嚇性字眼，應以「賦能(Empower)」和「預防」的角度給予建議。
+3. 輸出內容需詳實豐富，針對每個區塊給予深度的見解。</textarea>
                 </div>
             </div>
 
             <div class="w-1/2 flex flex-col gap-4">
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex-1 flex flex-col">
-                    <div class="flex justify-between items-end mb-4">
-                        <h3 class="text-sm font-bold text-slate-700">3. AI 生成衛教與處方草稿</h3>
-                        <button class="text-xs text-teal-600 hover:text-teal-700 flex items-center gap-1 font-bold">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                            重新生成
-                        </button>
-                    </div>
+                    <h3 class="text-sm font-bold text-slate-700 mb-3 text-teal-600">最終審核與 LINE 交付</h3>
                     
-                    <label class="text-xs text-slate-500 font-bold mb-1 block">總評摘要 (將顯示於 APP 首頁)</label>
-                    <textarea class="w-full h-32 border border-slate-300 rounded-lg p-3 text-sm text-slate-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 mb-4 resize-none leading-relaxed">吳女士您好，本次健檢整體狀況良好，肝腎功能優異。然而，您的 HDL-C (42) 偏低與空腹血糖 (102) 微幅上升，暗示著早期胰島素阻抗的萌芽。這容易引發午後疲勞或皮膚暗沈，請放心，透過專屬處方即可改善。</textarea>
+                    <label class="text-xs text-slate-500 font-bold mb-1 block">1. 貼上 AI 產出的分析結果 (可手動修改)</label>
+                    <textarea placeholder="請將 AI 生成的完美分析貼在此處，並進行最後的人工潤飾..." class="w-full h-full border border-slate-300 rounded-lg p-3 text-sm text-slate-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 mb-4 resize-none leading-relaxed"></textarea>
 
-                    <label class="text-xs text-slate-500 font-bold mb-1 block">健管師專屬問候 (選填，增加溫度)</label>
-                    <textarea placeholder="例如：吳小姐，最近看您常去日本出差，記得隨身攜帶我們推薦的魚油喔！" class="w-full h-20 border border-slate-300 rounded-lg p-3 text-sm text-slate-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 mb-4 resize-none bg-amber-50"></textarea>
-
-                    <label class="text-xs text-slate-500 font-bold mb-1 block">Marketplace 商品對接 (AI 推薦結果)</label>
-                    <div class="flex items-center justify-between p-3 border border-slate-200 rounded-lg bg-slate-50">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-white rounded border border-slate-200 flex items-center justify-center text-xl">🐟</div>
-                            <div>
-                                <p class="text-sm font-bold text-slate-700">極地純淨 Omega-3 魚油</p>
-                                <p class="text-xs text-slate-500">標籤：改善 HDL-C, 抗發炎</p>
-                            </div>
-                        </div>
-                        <button class="text-xs font-bold text-slate-500 hover:text-teal-600 underline">更換商品</button>
-                    </div>
+                    <label class="text-xs text-slate-500 font-bold mb-1 block">2. 健管師專屬問候 (增加真人溫度)</label>
+                    <textarea placeholder="例如：吳小姐，這是為您量身打造的深度分析，若有任何疑問歡迎隨時詢問！" class="w-full h-20 border border-slate-300 rounded-lg p-3 text-sm text-slate-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 mb-4 resize-none bg-amber-50"></textarea>
                 </div>
 
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex justify-between items-center">
-                    <button class="text-sm font-bold text-red-500 hover:bg-red-50 px-4 py-2 rounded-lg transition-colors border border-transparent hover:border-red-200">
-                        影像模糊，退回重拍
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex justify-end gap-3">
+                    <button onclick="alert('實戰模式提示：\n請複製上方確認無誤的報告內容，並前往「LINE Official Account Manager」的「一對一聊天」視窗，傳送給該客戶。')" class="text-sm font-bold text-white bg-teal-500 hover:bg-teal-600 px-6 py-2.5 rounded-lg shadow-md transition-colors flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                        複製內容並前往 LINE 發送
                     </button>
-                    <div class="flex gap-3">
-                        <button class="text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 px-6 py-2.5 rounded-lg transition-colors">
-                            儲存並依排程發布 (明日 10:00)
-                        </button>
-                        <button class="text-sm font-bold text-white bg-teal-500 hover:bg-teal-600 px-6 py-2.5 rounded-lg shadow-md transition-colors flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                            立即推送 LINE 報告
-                        </button>
-                    </div>
                 </div>
             </div>
 
         </main>
     </div>
 
+    <script>
+        function copyPrompt() {
+            var copyText = document.getElementById("aiPrompt");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); 
+            navigator.clipboard.writeText(copyText.value).then(() => {
+                alert("✅ 升級版指令已複製！請前往您的 AI 工具貼上執行。");
+            });
+        }
+    </script>
 </body>
 </html>
