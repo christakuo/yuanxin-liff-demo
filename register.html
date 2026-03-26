@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>元馨醫管家 - 尊榮會員申請</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0B1120; color: #F8FAFC; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="flex justify-center items-center min-h-screen px-5 py-10">
+
+    <div class="w-full max-w-md relative z-10">
+        <div class="text-center mb-8">
+            <p class="text-amber-500 text-sm font-semibold tracking-widest mb-2">PREMIUM MEMBERSHIP</p>
+            <h1 class="text-3xl font-bold text-white tracking-wide">尊榮會員申請</h1>
+            <p class="text-slate-400 text-xs mt-3">開啟您的全方位健康防護綠色通道</p>
+        </div>
+
+        <div class="glass-card rounded-3xl p-8 shadow-2xl border-t border-amber-500/30">
+            <form action="https://formspree.io/f/xeepqlok" method="POST" class="space-y-5">
+                <input type="hidden" name="_subject" value="【新單通知】元馨尊榮會員申請表！">
+                
+                <div>
+                    <label class="block text-slate-300 text-xs font-bold mb-2 tracking-wider">真實姓名</label>
+                    <input name="姓名" class="w-full bg-slate-800 border border-slate-600 text-white rounded-xl py-3 px-4 focus:outline-none focus:border-amber-500" type="text" required placeholder="請輸入姓名">
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 text-xs font-bold mb-2 tracking-wider">聯絡手機</label>
+                    <input name="手機" class="w-full bg-slate-800 border border-slate-600 text-white rounded-xl py-3 px-4 focus:outline-none focus:border-amber-500" type="tel" required placeholder="09XX-XXX-XXX">
+                </div>
+
+                <div>
+                    <label class="block text-amber-400 text-xs font-bold mb-2 tracking-wider">專屬健康顧問代碼 (若無請留白)</label>
+                    <input name="顧問代碼" class="w-full bg-amber-500/10 border border-amber-500/50 text-amber-300 rounded-xl py-3 px-4 focus:outline-none focus:border-amber-400 placeholder-amber-700/50" type="text" placeholder="例如：顧問的姓名或編號">
+                    <p class="text-[10px] text-slate-500 mt-1">這將協助我們為您對接專屬的服務人員</p>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 text-xs font-bold mb-2 tracking-wider">您最想改善的健康目標？</label>
+                    <select name="健康目標" class="w-full bg-slate-800 border border-slate-600 text-white rounded-xl py-3 px-4 focus:outline-none focus:border-amber-500">
+                        <option value="逆轉代謝與減重">逆轉代謝與減重</option>
+                        <option value="心血管風險管理">心血管風險管理</option>
+                        <option value="抗老與睡眠優化">抗老與睡眠優化</option>
+                        <option value="長輩樂齡照護">長輩樂齡照護</option>
+                        <option value="綜合健康評估">綜合健康評估</option>
+                    </select>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold py-4 px-4 rounded-xl shadow-lg hover:shadow-amber-500/25 transition-all">
+                        送出申請，專人聯繫
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
