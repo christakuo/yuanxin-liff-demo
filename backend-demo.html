@@ -31,7 +31,7 @@
         <div class="p-4 border-t border-slate-700 text-sm flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-white font-bold">I</div>
             <div>
-                <p class="text-white font-bold">Ivy (營運總監)</p>
+                <p class="text-white font-bold">Christa </p>
                 <p class="text-xs text-teal-400">工作站啟用中</p>
             </div>
         </div>
@@ -108,14 +108,14 @@
                     <h3 class="text-sm font-bold text-slate-700 mb-3 text-teal-600">最終審核與 LINE 交付</h3>
                     
                     <label class="text-xs text-slate-500 font-bold mb-1 block">1. 貼上 AI 產出的分析結果 (可手動修改)</label>
-                    <textarea placeholder="請將 AI 生成的完美分析貼在此處，並進行最後的人工潤飾..." class="w-full h-full border border-slate-300 rounded-lg p-3 text-sm text-slate-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 mb-4 resize-none leading-relaxed"></textarea>
+                    <textarea id="ai-insight-textarea" placeholder="請將 AI 生成的完美分析貼在此處，並進行最後的人工潤飾..." class="w-full h-full border border-slate-300 rounded-lg p-3 text-sm text-slate-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 mb-4 resize-none leading-relaxed"></textarea>
 
                     <label class="text-xs text-slate-500 font-bold mb-1 block">2. 健管師專屬問候 (增加真人溫度)</label>
-                    <textarea placeholder="例如：吳小姐，這是為您量身打造的深度分析，若有任何疑問歡迎隨時詢問！" class="w-full h-20 border border-slate-300 rounded-lg p-3 text-sm text-slate-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 mb-4 resize-none bg-amber-50"></textarea>
+                    <textarea id="greeting-textarea" placeholder="例如：吳小姐，這是為您量身打造的深度分析，若有任何疑問歡迎隨時詢問！" class="w-full h-20 border border-slate-300 rounded-lg p-3 text-sm text-slate-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 mb-4 resize-none bg-amber-50"></textarea>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex justify-end gap-3">
-                    <button onclick="alert('實戰模式提示：\n請複製上方確認無誤的報告內容，並前往「LINE Official Account Manager」的「一對一聊天」視窗，傳送給該客戶。')" class="text-sm font-bold text-white bg-teal-500 hover:bg-teal-600 px-6 py-2.5 rounded-lg shadow-md transition-colors flex items-center gap-2">
+                    <button id="send-line-btn" class="text-sm font-bold text-white bg-teal-500 hover:bg-teal-600 px-6 py-2.5 rounded-lg shadow-md transition-colors flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                         複製內容並前往 LINE 發送
                     </button>
@@ -126,6 +126,7 @@
     </div>
 
     <script>
+        // 複製 AI 指令的功能
         function copyPrompt() {
             var copyText = document.getElementById("aiPrompt");
             copyText.select();
@@ -134,6 +135,68 @@
                 alert("✅ 升級版指令已複製！請前往您的 AI 工具貼上執行。");
             });
         }
+
+        // 一鍵發送至 LINE 的功能
+        document.getElementById('send-line-btn').addEventListener('click', async function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            
+            // 1. 變更按鈕狀態為發送中
+            btn.innerHTML = '🚀 報告發送中...';
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+
+            // 2. 蒐集畫面上醫管家填寫的資料
+            // 🚨 重要提醒：測試前請務必把下方的 userId 換成你在開發者後台拿到的「U開頭字串」！🚨
+            const payload = {
+                userId: '請替換成你的_LINE_USER_ID', // <--- 請修改這裡！
+                clientName: '吳惠君 女士',
+                healthScore: '82',
+                alertTitle1: '代謝機能',
+                alertStatus1: '注意',
+                alertTitle2: '肝腎功能',
+                alertStatus2: '優良',
+                aiInsight: document.querySelector('#ai-insight-textarea').value || '系統觀察到您正處於代謝效率轉換期。您的 HDL-C 偏低與空腹血糖微幅上升，暗示著早期胰島素阻抗的萌芽。請放心，透過以下處方，我們能輕鬆喚醒細胞代謝力，逆轉此狀態。',
+                consultantGreeting: document.querySelector('#greeting-textarea').value || '吳小姐，這是為您量身打造的初步分析，若有任何疑問歡迎隨時點擊下方按鈕預約專屬諮詢！'
+            };
+
+            // 3. 呼叫我們剛剛寫好的後端 API
+            try {
+                const response = await fetch('/api/send-report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    // 成功發送的視覺回饋
+                    btn.innerHTML = '✅ 已成功發送至 LINE';
+                    btn.style.backgroundColor = '#20D0A8'; // 變成薄荷綠
+                    btn.style.color = '#162032';
+                    
+                    // 3秒後按鈕恢復原狀，方便下次發送
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                        btn.style.backgroundColor = '';
+                        btn.style.color = '';
+                    }, 3000);
+                } else {
+                    throw new Error('發送失敗');
+                }
+            } catch (error) {
+                console.error('發送錯誤:', error);
+                btn.innerHTML = '❌ 發送失敗，請重試';
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                
+                // 3秒後按鈕恢復原狀
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                }, 3000);
+            }
+        });
     </script>
 </body>
 </html>
