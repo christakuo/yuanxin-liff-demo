@@ -1,10 +1,10 @@
-// 檔案位置：api/send-report.js
+// 檔案位置：send-report.js
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // 1. 接收前端傳來的資料 (現在不需要 userId 了！)
+  // 1. 接收前端傳來的資料 
   const { 
     clientName, healthScore, 
     alertTitle1, alertStatus1, alertTitle2, alertStatus2, 
@@ -13,7 +13,7 @@ export default async function handler(req, res) {
 
   const LINE_ACCESS_TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN;
 
-  // 2. 準備 Flex Message 樣板
+  // 2. 準備 Flex Message 樣板 (隱藏商城按鈕版)
   const flexMessage = {
     type: "flex",
     altText: "元馨醫管家 - 您的 AI 初步解析報告已出爐",
@@ -82,11 +82,18 @@ export default async function handler(req, res) {
         "backgroundColor": "#0B1426", "paddingAll": "xl"
       },
       "footer": {
-        "type": "box", "layout": "vertical", "contents": [
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
           {
             "type": "button",
-            "action": { "type": "uri", "label": "預約真人醫管家深度解析", "uri": "https://liff.line.me/2009597152-9nSswjnk" },
-            "style": "primary", "color": "#1A73E8"
+            "action": {
+              "type": "message",
+              "label": "預約真人醫管家深度解析",
+              "text": "您好，我想預約真人醫管家進行一對一深度諮詢！"
+            },
+            "style": "primary",
+            "color": "#1A73E8"
           }
         ],
         "backgroundColor": "#0B1426", "paddingAll": "xl"
@@ -94,7 +101,7 @@ export default async function handler(req, res) {
     }
   };
 
-  // 3. 改用 LINE 的 Broadcast (群發) API，完全不需要 User ID！
+  // 3. 改用 LINE 的 Broadcast (群發) API
   try {
     const response = await fetch('https://api.line.me/v2/bot/message/broadcast', {
       method: 'POST',
