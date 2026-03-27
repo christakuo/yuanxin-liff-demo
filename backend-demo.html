@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>元馨醫管家 - 內部營運工作站 (升級指令版)</title>
+    <title>元馨醫管家 - 內部營運工作站 (動態發送版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #F8FAFC; }
@@ -22,16 +22,16 @@
             <p class="text-xs font-bold text-slate-500 mb-4 px-2 tracking-widest">SOP 任務面板</p>
             <a href="#" class="flex items-center gap-3 bg-teal-500/10 text-teal-400 px-4 py-3 rounded-lg font-medium mb-2 border border-teal-500/20">
                 <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
-                處理中：吳惠君 (待發送)
+                處理中：新進報告 (待發送)
             </a>
             <a href="#" class="flex items-center gap-3 hover:bg-slate-800 px-4 py-3 rounded-lg font-medium transition-colors mb-2">
                 客戶健康檔案庫
             </a>
         </div>
         <div class="p-4 border-t border-slate-700 text-sm flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-white font-bold">I</div>
+            <div class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-white font-bold">C</div>
             <div>
-                <p class="text-white font-bold">Christa </p>
+                <p class="text-white font-bold">Christa (營運總監)</p>
                 <p class="text-xs text-teal-400">工作站啟用中</p>
             </div>
         </div>
@@ -41,7 +41,7 @@
         <header class="bg-white h-16 border-b border-slate-200 flex items-center justify-between px-8 shadow-sm z-10">
             <div class="flex items-center gap-4">
                 <span class="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full border border-amber-200">步驟 3 & 4：AI 解析與審核</span>
-                <h2 class="text-lg font-bold">當前任務：吳惠君 (UID: 1982***34)</h2>
+                <h2 class="text-lg font-bold">當前任務：審核並發送初步報告</h2>
             </div>
         </header>
 
@@ -83,41 +83,52 @@
 
 ## 三、全方位生活習慣處方
 (請分點條列，提供具體且可執行的建議)
-* 飲食調理：(應多吃什麼、避免什麼、為什麼要這樣吃)
-* 運動處方：(適合該年齡層與體能狀況的運動類型與頻率、這樣做的好處是什麼)
-* 睡眠與紓壓：(針對生活習慣的調整建議、具體給出完整說明)
 
-## 四、專屬保健與商城選品建議
-(基於上述分析，推薦客戶需要補充的營養素。請自然地引導客戶至『元馨醫管家商城』尋找對應的保健產品。語氣要像專業顧問的貼心建議，而非強迫推銷。)
-
-## 五、風險轉嫁與保險規劃建議
-(根據客戶目前的健康紅字與未來潛在風險，提供醫療險、重大傷病險或長照險等相關保險檢視的善意提醒，作為預防醫學的財務防線。)
-
-## 六、醫管家溫馨提醒
-(請務必包含以下免責聲明：本報告由 AI 輔助生成，旨在提供全方位的健康管理與生活型態調整建議，不具備醫療診斷效力。若有急性不適或需進一步治療，建議攜帶完整報告至醫療院所尋求專業醫師協助。)
-
-# Constraints
-1. 絕不捏造數據或給出無醫學根據的偏方。
-2. 避免使用恐嚇性字眼，應以「賦能(Empower)」和「預防」的角度給予建議。
-3. 輸出內容需詳實豐富，針對每個區塊給予深度的見解。</textarea>
+## 四、醫管家溫馨提醒
+(聲明本報告為輔助生成，不具醫療效力。)</textarea>
                 </div>
             </div>
 
             <div class="w-1/2 flex flex-col gap-4">
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex-1 flex flex-col">
-                    <h3 class="text-sm font-bold text-slate-700 mb-3 text-teal-600">最終審核與 LINE 交付</h3>
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex-1 flex flex-col overflow-y-auto">
+                    <h3 class="text-sm font-bold text-slate-700 mb-3 text-teal-600">最終審核與 LINE 交付參數</h3>
                     
-                    <label class="text-xs text-slate-500 font-bold mb-1 block">1. 貼上 AI 產出的分析結果 (可手動修改)</label>
-                    <textarea id="ai-insight-textarea" placeholder="請將 AI 生成的完美分析貼在此處，並進行最後的人工潤飾..." class="w-full h-full border border-slate-300 rounded-lg p-3 text-sm text-slate-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 mb-4 resize-none leading-relaxed"></textarea>
+                    <div class="grid grid-cols-2 gap-3 mb-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
+                        <div>
+                            <label class="text-xs text-slate-500 font-bold mb-1 block">客戶姓名 (含稱謂)</label>
+                            <input type="text" id="client-name-input" placeholder="例如：張大明 先生" class="w-full border border-slate-300 rounded p-2 text-sm focus:border-teal-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-500 font-bold mb-1 block">健康評分 (0-100)</label>
+                            <input type="number" id="health-score-input" placeholder="例如：85" class="w-full border border-slate-300 rounded p-2 text-sm focus:border-teal-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-500 font-bold mb-1 block">指標一 (標題 / 狀態)</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="alert-title-1" placeholder="如:代謝機能" class="w-1/2 border border-slate-300 rounded p-2 text-sm focus:outline-none">
+                                <input type="text" id="alert-status-1" placeholder="如:注意" class="w-1/2 border border-slate-300 rounded p-2 text-sm text-red-500 font-bold focus:outline-none">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-500 font-bold mb-1 block">指標二 (標題 / 狀態)</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="alert-title-2" placeholder="如:肝腎功能" class="w-1/2 border border-slate-300 rounded p-2 text-sm focus:outline-none">
+                                <input type="text" id="alert-status-2" placeholder="如:優良" class="w-1/2 border border-slate-300 rounded p-2 text-sm text-teal-600 font-bold focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <label class="text-xs text-slate-500 font-bold mb-1 block">1. 貼上 AI 產出的分析結果 (總評摘要)</label>
+                    <textarea id="ai-insight-textarea" placeholder="請將 AI 生成的完美分析貼在此處，並進行最後的人工潤飾..." class="w-full h-40 border border-slate-300 rounded-lg p-3 text-sm text-slate-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 mb-4 resize-none leading-relaxed"></textarea>
 
                     <label class="text-xs text-slate-500 font-bold mb-1 block">2. 健管師專屬問候 (增加真人溫度)</label>
-                    <textarea id="greeting-textarea" placeholder="例如：吳小姐，這是為您量身打造的深度分析，若有任何疑問歡迎隨時詢問！" class="w-full h-20 border border-slate-300 rounded-lg p-3 text-sm text-slate-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 mb-4 resize-none bg-amber-50"></textarea>
+                    <textarea id="greeting-textarea" placeholder="例如：吳小姐，這是為您量身打造的深度分析，若有任何疑問歡迎隨時點擊下方按鈕預約專屬諮詢！" class="w-full h-20 border border-slate-300 rounded-lg p-3 text-sm text-slate-700 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 mb-4 resize-none bg-amber-50"></textarea>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex justify-end gap-3">
                     <button id="send-line-btn" class="text-sm font-bold text-white bg-teal-500 hover:bg-teal-600 px-6 py-2.5 rounded-lg shadow-md transition-colors flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                        複製內容並前往 LINE 發送
+                        一鍵發送至 LINE
                     </button>
                 </div>
             </div>
@@ -126,7 +137,7 @@
     </div>
 
     <script>
-        // 複製 AI 指令的功能
+        // 複製 AI 指令
         function copyPrompt() {
             var copyText = document.getElementById("aiPrompt");
             copyText.select();
@@ -136,31 +147,28 @@
             });
         }
 
-        // 一鍵發送至 LINE 的功能
+        // 一鍵發送 API 串接
         document.getElementById('send-line-btn').addEventListener('click', async function() {
             const btn = this;
             const originalText = btn.innerHTML;
             
-            // 1. 變更按鈕狀態為發送中
+            // 變更按鈕狀態
             btn.innerHTML = '🚀 報告發送中...';
             btn.disabled = true;
             btn.style.opacity = '0.7';
 
-            // 2. 蒐集畫面上醫管家填寫的資料
-            // 🚨 重要提醒：測試前請務必把下方的 userId 換成你在開發者後台拿到的「U開頭字串」！🚨
+            // 蒐集畫面上所有輸入框的資料
             const payload = {
-                userId: '請替換成你的_LINE_USER_ID', // <--- 請修改這裡！
-                clientName: '吳惠君 女士',
-                healthScore: '82',
-                alertTitle1: '代謝機能',
-                alertStatus1: '注意',
-                alertTitle2: '肝腎功能',
-                alertStatus2: '優良',
-                aiInsight: document.querySelector('#ai-insight-textarea').value || '系統觀察到您正處於代謝效率轉換期。您的 HDL-C 偏低與空腹血糖微幅上升，暗示著早期胰島素阻抗的萌芽。請放心，透過以下處方，我們能輕鬆喚醒細胞代謝力，逆轉此狀態。',
-                consultantGreeting: document.querySelector('#greeting-textarea').value || '吳小姐，這是為您量身打造的初步分析，若有任何疑問歡迎隨時點擊下方按鈕預約專屬諮詢！'
+                clientName: document.getElementById('client-name-input').value || '貴賓',
+                healthScore: document.getElementById('health-score-input').value || '未評分',
+                alertTitle1: document.getElementById('alert-title-1').value || '-',
+                alertStatus1: document.getElementById('alert-status-1').value || '-',
+                alertTitle2: document.getElementById('alert-title-2').value || '-',
+                alertStatus2: document.getElementById('alert-status-2').value || '-',
+                aiInsight: document.getElementById('ai-insight-textarea').value || '您的專屬健康洞察已經產出，請聯繫醫管家。',
+                consultantGreeting: document.getElementById('greeting-textarea').value || '這是為您量身打造的初步分析，若有任何疑問歡迎隨時點擊下方按鈕預約專屬諮詢！'
             };
 
-            // 3. 呼叫我們剛剛寫好的後端 API
             try {
                 const response = await fetch('/api/send-report', {
                     method: 'POST',
@@ -169,12 +177,9 @@
                 });
 
                 if (response.ok) {
-                    // 成功發送的視覺回饋
                     btn.innerHTML = '✅ 已成功發送至 LINE';
-                    btn.style.backgroundColor = '#20D0A8'; // 變成薄荷綠
+                    btn.style.backgroundColor = '#20D0A8'; 
                     btn.style.color = '#162032';
-                    
-                    // 3秒後按鈕恢復原狀，方便下次發送
                     setTimeout(() => {
                         btn.innerHTML = originalText;
                         btn.disabled = false;
@@ -190,8 +195,6 @@
                 btn.innerHTML = '❌ 發送失敗，請重試';
                 btn.disabled = false;
                 btn.style.opacity = '1';
-                
-                // 3秒後按鈕恢復原狀
                 setTimeout(() => {
                     btn.innerHTML = originalText;
                 }, 3000);
