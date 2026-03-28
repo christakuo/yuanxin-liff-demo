@@ -2,19 +2,37 @@
 import nodemailer from 'nodemailer';
 
 export default async function handler(req, res) {
+  // ==========================================
+  // 1. 設定 CORS 安全標頭 (發放 VIP 通行證)
+  // 允許 Netlify 跨網域呼叫 Vercel 發信機
+  // ==========================================
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*'); 
+  res.setHeader('Access-Control-Allow-Methods', 'OPTIONS,POST');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
+
+  // 處理瀏覽器的預先檢查 (Preflight)
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
+
   // 只允許 POST 請求
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // 1. 接收前端(報名表單)傳來的候選人資料
+  // 2. 接收前端(培訓確認單)傳來的候選人資料
   const { name, email } = req.body;
 
   if (!email) {
     return res.status(400).json({ error: 'Email is required' });
   }
 
-  // 2. 設定 Gmail 發信機
+  // 3. 設定 Gmail 發信機
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -23,7 +41,7 @@ export default async function handler(req, res) {
     }
   });
 
-  // 3. 撰寫信件內容 (支援 HTML 精美排版)
+  // 4. 撰寫信件內容 (已替換為你的專屬合約網址)
   const mailOptions = {
     from: `"元馨醫管家 營運團隊" <${process.env.GMAIL_USER_EMAIL}>`,
     to: email,
@@ -42,7 +60,7 @@ export default async function handler(req, res) {
         <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
         
         <h3 style="color: #1A73E8;">✅ 下一步行動：線上簽署合約</h3>
-        <p>若您已閱讀完畢並同意我們的合作模式，請點擊下方連結，完成線上《健康顧問合約書》簽署，並繳交您的獎金匯款帳戶資料：</p>
+        <p>若您已閱讀完畢並同意我們的合作模式，請點擊下方連結，完成線上《顧問合約書》簽署，並繳交您的獎金匯款帳戶資料：</p>
         
         <p style="text-align: center; margin: 30px 0;">
           <a href="https://health-consultant-contract.netlify.app/" style="display: inline-block; padding: 12px 24px; background-color: #1A73E8; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; letter-spacing: 1px;">前往簽署顧問合約書</a>
@@ -55,7 +73,7 @@ export default async function handler(req, res) {
     `
   };
 
-  // 4. 寄出信件
+  // 5. 寄出信件
   try {
     await transporter.sendMail(mailOptions);
     res.status(200).json({ success: true, message: '合約信件已成功寄出！' });
