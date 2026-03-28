@@ -1,0 +1,8 @@
+{
+  "name": "yuanxin-backend",
+  "version": "1.0.0",
+  "description": "元馨醫管家發信系統",
+  "dependencies": {
+    "nodemailer": "^6.9.13"
+  }
+}
