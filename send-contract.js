@@ -1,8 +1,8 @@
 // 檔案位置：api/send-contract.js
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer'); // <--- 換成這種最傳統、最穩定的語法
 
 // ==========================================
-// 核心防護罩：強制發放跨網域通行證 (CORS Wrapper)
+// 核心防護罩：強制發放跨網域通行證 (CORS)
 // ==========================================
 const allowCors = fn => async (req, res) => {
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -37,7 +37,7 @@ const handler = async (req, res) => {
       return res.status(400).json({ error: '沒有收到 Email 參數' });
     }
 
-    // 設定 Gmail 發信機 (抓取 Vercel 後台的環境變數)
+    // 設定 Gmail 發信機
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -83,11 +83,10 @@ const handler = async (req, res) => {
     res.status(200).json({ success: true, message: '合約信件已成功寄出！' });
 
   } catch (error) {
-    // 發生錯誤時，把真實原因回傳給前端
     console.error('發信內部錯誤:', error);
     res.status(500).json({ success: false, error: error.message || '發信機內部發生未知的錯誤' });
   }
 };
 
-// 輸出套用防護罩後的程式
-export default allowCors(handler);
+// 配合傳統語法的輸出寫法
+module.exports = allowCors(handler);
