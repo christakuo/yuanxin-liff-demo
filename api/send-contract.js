@@ -1,5 +1,5 @@
 // 檔案位置：api/send-contract.js
-const nodemailer = require('nodemailer'); // <--- 換成這種最傳統、最穩定的語法
+const nodemailer = require('nodemailer'); 
 
 // ==========================================
 // 核心防護罩：強制發放跨網域通行證 (CORS)
@@ -13,12 +13,10 @@ const allowCors = fn => async (req, res) => {
     'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
   );
   
-  // 處理瀏覽器的事前詢問 (Preflight)
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
-  // 執行主程式
   return await fn(req, res);
 };
 
@@ -58,8 +56,10 @@ const handler = async (req, res) => {
           <p>我們非常期待您的加入，與我們一同推廣預防醫學的理念。附件與雲端連結為我們為您準備的專屬資料：</p>
           
           <div style="background-color: #F8FAFC; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 0;">📘 <strong>《健康顧問工作說明書及執行手冊》</strong><br>
-            <span style="font-size: 14px; color: #666;">（請先詳細閱讀，了解我們的核心理念、健康管理方案價值與服務流程）</span></p>
+            <p style="margin: 0;">
+              📘 <a href="https://drive.google.com/file/d/16W3rYhvZTkxZwaIZVSr6aIklXZ1rnPMi/view?usp=sharing" target="_blank" style="color: #1A73E8; font-weight: bold; font-size: 16px; text-decoration: underline;">《健康顧問工作說明書及執行手冊》(點擊線上觀看)</a><br>
+              <span style="font-size: 14px; color: #666;">（請先詳細閱讀，了解我們的核心理念、健康管理方案價值與服務流程）</span>
+            </p>
           </div>
 
           <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
@@ -88,5 +88,4 @@ const handler = async (req, res) => {
   }
 };
 
-// 配合傳統語法的輸出寫法
 module.exports = allowCors(handler);
