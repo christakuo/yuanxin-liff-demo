@@ -1,15 +1,21 @@
-// 檔案位置：send-report.js
+// 檔案位置：api/send-report.js
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  // 1. 接收前端傳來的資料 
+  // 1. 接收前端傳來的資料 (已新增 userId)
   const { 
+    userId,
     clientName, healthScore, 
     alertTitle1, alertStatus1, alertTitle2, alertStatus2, 
     aiInsight, consultantGreeting 
   } = req.body;
+
+  // 嚴格防呆：如果沒有 userId 就擋下不發，保護系統安全
+  if (!userId) {
+    return res.status(400).json({ error: '必須提供客戶的 LINE User ID 才能進行單獨推播' });
+  }
 
   const LINE_ACCESS_TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN;
 
@@ -101,21 +107,22 @@ export default async function handler(req, res) {
     }
   };
 
-  // 3. 改用 LINE 的 Broadcast (群發) API
+  // 3. 改用 LINE 的 Push (私訊推播) API，只發送給特定對象
   try {
-    const response = await fetch('https://api.line.me/v2/bot/message/broadcast', {
+    const response = await fetch('https://api.line.me/v2/bot/message/push', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${LINE_ACCESS_TOKEN}`
       },
       body: JSON.stringify({
+        to: userId, // 精準狙擊：指定接收者的 LINE User ID
         messages: [flexMessage]
       })
     });
 
     if (response.ok) {
-      res.status(200).json({ success: true, message: '成功廣播推播至 LINE' });
+      res.status(200).json({ success: true, message: '成功推播私訊至客戶 LINE' });
     } else {
       const errorData = await response.json();
       res.status(response.status).json({ success: false, error: errorData });
