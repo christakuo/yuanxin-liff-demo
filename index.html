@@ -64,7 +64,9 @@
 
             <div class="glass-card p-5 rounded-3xl mb-8 border border-white/5 shadow-inner">
                 <h3 class="text-white font-bold text-sm mb-4 pl-2 tracking-wide">📊 血糖趨勢追蹤 (三年)</h3>
-                <div class="w-full h-48"><canvas id="premiumLineChart"></canvas></div>
+                <div class="w-full h-48">
+                    <canvas id="premiumLineChart"></canvas>
+                </div>
             </div>
 
             <div class="glass-card rounded-2xl p-5 mb-8 border-l-4 border-l-teal-400">
@@ -73,13 +75,36 @@
                     <h3 class="text-white font-bold text-base tracking-wide">專屬健康洞察</h3>
                 </div>
                 <p class="text-slate-300 text-[13px] leading-relaxed mb-3">
-                    您在肝腎功能表現優異。然而，透過多項代謝指標交叉比對，系統觀察到您正處於<span class="text-teal-400 font-bold">「代謝效率轉換期」</span>。您的 HDL-C 偏低與空腹血糖微幅上升，暗示著<span class="text-red-400 font-bold">早期胰島素阻抗</span>的萌芽。這不僅增加心血管隱性負擔，也容易引發午後疲勞或皮膚暗沈。請放心，透過以下處方，我們能輕鬆喚醒細胞代謝力，逆轉此狀態。
+                    您在肝腎功能表現優異。然而，透過多項代謝指標交叉比對，系統觀察到您正處於<span class="text-teal-400 font-bold">「代謝效率轉換期」</span>。
+                </p>
+                <p class="text-slate-300 text-[13px] leading-relaxed">
+                    您的 HDL-C 偏低與空腹血糖微幅上升，暗示著<span class="text-red-400 font-bold">早期胰島素阻抗</span>的萌芽。這不僅增加心血管隱性負擔，也容易引發午後疲勞或皮膚暗沈。請放心，透過以下處方，我們能輕鬆喚醒細胞代謝力，逆轉此狀態。
                 </p>
             </div>
 
+            <h3 class="text-white font-bold text-sm mb-4 pl-2 tracking-wide">🎯 精準生活處方</h3>
+            <div class="space-y-4 mb-8">
+                <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4">
+                    <h4 class="text-teal-400 font-bold text-[13px] mb-2">🥗 1. 營養與腸道微生態重建</h4>
+                    <ul class="text-slate-300 text-[12px] space-y-2 list-none">
+                        <li class="flex gap-2"><span class="text-teal-500">•</span><span><strong class="text-white">碳水後置法：</strong>用餐先吃蛋白質與蔬菜，最後吃澱粉，延緩腸道吸收糖分。</span></li>
+                        <li class="flex gap-2"><span class="text-teal-500">•</span><span><strong class="text-white">抗發炎好油介入：</strong>每週 3 次深海魚類，補充 Omega-3 修復腸道黏膜。</span></li>
+                    </ul>
+                </div>
+                <div class="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4">
+                    <h4 class="text-teal-400 font-bold text-[13px] mb-2">🏃‍♀️ 2. 細胞粒線體優化運動</h4>
+                    <ul class="text-slate-300 text-[12px] space-y-2 list-none">
+                        <li class="flex gap-2"><span class="text-teal-500">•</span><span><strong class="text-white">Zone 2 有氧：</strong>每週 3 次、每次 40 分鐘超慢跑，提升好膽固醇並增加燃脂效率。</span></li>
+                        <li class="flex gap-2"><span class="text-teal-500">•</span><span><strong class="text-white">阻力訓練：</strong>肌肉是最大的血糖儲藏室。每週 2 次下肢訓練（如深蹲）能吸走多餘糖分。</span></li>
+                    </ul>
+                </div>
+            </div>
+
             <div class="glass-card p-5 rounded-3xl mb-12">
-                <h3 class="text-white font-bold text-sm mb-4 pl-2 tracking-wide">🧠 全面維度分析</h3>
-                <div class="w-full h-56"><canvas id="demoRadarChart"></canvas></div>
+                <h3 class="text-white font-bold text-sm mb-4 pl-2 tracking-wide">🧠 全面維度分析 (功能醫學視角)</h3>
+                <div class="w-full h-56">
+                    <canvas id="demoRadarChart"></canvas>
+                </div>
             </div>
 
             <div class="mt-8 mb-6 border-t border-slate-700 pt-8">
@@ -173,7 +198,7 @@
             }
         }
 
-        // 📲 LINE 原生上傳魔法 + 背景 UID 寄信功能 (重點修復區)
+        // 📲 LINE 原生上傳魔法 + 背景 Formspree 寄信功能 (完整保留版)
         async function sendLineMessageAndClose() {
             const idInput = document.getElementById('realIdInput').value.trim().toUpperCase();
             try {
@@ -184,18 +209,18 @@
                     const lineName = profile.displayName;
 
                     // 2. 打包資料準備寄信
-                    const formData = new FormData();
-                    formData.append('客戶LINE暱稱', lineName);
-                    formData.append('真實身分證字號', idInput);
-                    formData.append('指定接收者_LINE_UID', lineUid);
-                    formData.append('_subject', '【客戶綁定通知】有客戶準備上傳健檢報告！');
-                    formData.append('_captcha', 'false');
+                    const data = {
+                        "客戶LINE暱稱": lineName,
+                        "真實身分證字號": idInput,
+                        "指定接收者_LINE_UID": lineUid,
+                        "_subject": "【客戶綁定通知】有客戶準備上傳健檢報告！"
+                    };
 
-                    // 3. 背景發送通知信到你的信箱 (補回這個最重要的雷達！)
-                    fetch('https://formsubmit.co/ajax/christa.kuo888@gmail.com', {
+                    // 3. 使用你已經成功接收過信件的 Formspree ID (xeepqlok)
+                    fetch('https://formspree.io/f/xeepqlok', {
                         method: 'POST',
-                        body: formData,
-                        headers: { 'Accept': 'application/json' }
+                        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
                     }).catch(err => console.log('通知信發送失敗', err));
 
                     // 4. 代發 LINE 訊息並關閉視窗
