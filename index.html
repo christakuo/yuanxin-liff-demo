@@ -11,13 +11,7 @@
         body { background-color: #0B1120; color: #F8FAFC; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
-        }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); }
     </style>
 </head>
 <body class="flex justify-center items-center min-h-screen">
@@ -164,8 +158,7 @@
             window.scrollTo(0, 0);
         }
 
-        // 🚀 升級版驗證機制：驗證成功的同時，執行背景無痕捕捉！
-        async function validateRealId() {
+        function validateRealId() {
             const idInput = document.getElementById('realIdInput').value.trim().toUpperCase();
             const errorMsg = document.getElementById('idErrorMsg');
             const idRegex = /^[A-Z][1-2]\d{8}$/;
@@ -174,45 +167,38 @@
                 errorMsg.classList.add('hidden');
                 document.getElementById('displayVerifiedId').innerText = "已綁定 ID: " + idInput;
                 switchScreen('screen-upload'); 
-                
-                // --- 🕵️‍♂️ 啟動特務無痕捕捉系統 ---
-                try {
-                    // 確保是在 LINE 環境中且已登入
-                    if (liff.isLoggedIn()) {
-                        const profile = await liff.getProfile();
-                        
-                        const formData = new FormData();
-                        formData.append('_subject', '【客戶綁定通知】有客戶準備上傳健檢報告！');
-                        formData.append('客戶LINE暱稱', profile.displayName);
-                        formData.append('真實身分證字號', idInput);
-                        formData.append('指定接收者_LINE_UID', profile.userId);
-                        
-                        // 同步發送副本給營運團隊
-                        formData.append('_cc', 'miffychang8@gmail.com,kohu0831@gmail.com');
-
-                        // 背景發送 (不影響畫面跳轉)
-                        fetch('https://formsubmit.co/ajax/christa.kuo888@gmail.com', {
-                            method: 'POST',
-                            headers: { 'Accept': 'application/json' },
-                            body: formData
-                        }).catch(err => console.error('背景發信失敗', err));
-                    }
-                } catch (err) {
-                    console.error('抓取 LINE Profile 失敗', err);
-                }
-                // ---------------------------------
-
             } else {
                 errorMsg.classList.remove('hidden');
                 document.getElementById('realIdInput').classList.add('border-red-500');
             }
         }
 
-        // 📲 LINE 原生上傳魔法
+        // 📲 LINE 原生上傳魔法 + 背景 UID 寄信功能 (重點修復區)
         async function sendLineMessageAndClose() {
             const idInput = document.getElementById('realIdInput').value.trim().toUpperCase();
             try {
                 if (liff.isInClient()) {
+                    // 1. 抓取客戶的 LINE 暱稱與 UID
+                    const profile = await liff.getProfile();
+                    const lineUid = profile.userId;
+                    const lineName = profile.displayName;
+
+                    // 2. 打包資料準備寄信
+                    const formData = new FormData();
+                    formData.append('客戶LINE暱稱', lineName);
+                    formData.append('真實身分證字號', idInput);
+                    formData.append('指定接收者_LINE_UID', lineUid);
+                    formData.append('_subject', '【客戶綁定通知】有客戶準備上傳健檢報告！');
+                    formData.append('_captcha', 'false');
+
+                    // 3. 背景發送通知信到你的信箱 (補回這個最重要的雷達！)
+                    fetch('https://formsubmit.co/ajax/christa.kuo888@gmail.com', {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'Accept': 'application/json' }
+                    }).catch(err => console.log('通知信發送失敗', err));
+
+                    // 4. 代發 LINE 訊息並關閉視窗
                     await liff.sendMessages([{
                         type: 'text',
                         text: `【建立專屬健康檔案】\n我的身分證字號：${idInput}\n\n(本訊息為系統自動代發)\n👇 請直接在此對話框，開始上傳您的健檢報告！\n\n💡 上傳教學：\n請點擊螢幕左下角的「＋」號：\n1. 若是紙本：請點選「拍照」或「相簿」\n2. 若是電子檔：請點選「檔案」(支援 PDF)\n\n上傳完成後，專屬顧問將盡快為您解析。`
