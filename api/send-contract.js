@@ -68,7 +68,7 @@ const handler = async (req, res) => {
           <p>若您已閱讀完畢並同意我們的合作模式，請點擊下方連結，完成線上《顧問合約書》簽署，並繳交您的獎金匯款帳戶資料：</p>
           
           <p style="text-align: center; margin: 30px 0;">
-            <a href="https://health-consultant-contract.netlify.app/" style="display: inline-block; padding: 12px 24px; background-color: #1A73E8; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; letter-spacing: 1px;">前往簽署顧問合約書</a>
+            <a href="https://yuanxin-liff-demo.vercel.app/consultant-agreement.html" style="display: inline-block; padding: 12px 24px; background-color: #1A73E8; color: white; text-decoration: none; border-radius: 5px; font-weight: bold; letter-spacing: 1px;">前往簽署顧問合約書</a>
           </p>
           
           <p>完成簽署後，系統將會為您開通專屬的收款 QR Code 與推薦碼！</p>
