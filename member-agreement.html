@@ -63,8 +63,34 @@
             <p><strong>乙方：<span id="display-name-2" class="border-b border-slate-400 inline-block min-w-[100px] text-center px-2 text-blue-600"></span></strong> (以下簡稱乙方，即會員)</p>
         </div>
 
-        <p class="text-center text-slate-400 mt-10 mb-10">(為節省版面，以下合約條文請參考正式 PDF 檔案)</p>
+        <h3>第一條 服務費用與期間</h3>
+        <p>1. 服務費用：本年度計畫費用如「第一部份：會員專屬服務內容」。</p>
+        <p>2. 服務期間：自簽署日 <strong id="start-date" class="text-teal-600"></strong> 起至 <strong id="end-date" class="text-teal-600"></strong> 算一年，期滿本合約自動失效。</p>
 
+        <h3>第二條 甲方之義務與醫療免責聲明</h3>
+        <p>1. 甲方所提供之「醫管家」諮詢與「AI 預警」均屬健康管理建議，旨在協助乙方進行預防醫學管理。</p>
+        <p>2. 免責聲明：甲方並非醫療機構，本服務所提供之建議內容不具備醫療診斷、處方或治療效果。乙方若有身體不適，應尋求執業醫師之專業診斷。</p>
+
+        <h3>第三條 家庭方案專項條款(增訂)</h3>
+        <p>1. 共同簽署與同時啟動<br>家庭方案（含加購成員）之全體成員須同時完成繳費並簽署本協議，方可享有該方案之優惠價格與相關權益。</p>
+        <p>2. 家庭數據互通與授權<br>(1) 選擇家庭方案即代表成員間同意建立「健康守護圈」。各成員應於元馨醫管家官方Line中完成彼此之數據授權，允許緊急風險預警通知發送予圈內其他成員。<br>(2) 甲方保證除緊急預警外，其餘詳細健康紀錄仍受個資法保護，未經成員各別同意不得向他人洩漏。</p>
+        <p>3. 家庭方案退費與方案轉換<br>(1) 綑綁優惠原則：家庭方案屬「團購組合優惠」，全體成員視為一體。<br>(2) 退費關聯性：若其中任一成員於 7 日猶豫期內（且未啟動服務前）申請退費，則全組方案自動失效。<br>(3) 方案轉換機制：若家庭方案因部分成員退費而失效，剩餘成員若欲繼續使用服務，須依下列方式辦理：<br>　(A) 補足差額轉為「個人尊榮」方案（每人補足至 $26,800 元）。<br>　(B) 尋找新成員加入並補足家庭方案之全額。<br>(4) 啟動後不予退費：凡全組中任一成員已發生本協議第六條所列之「服務啟動」行為，則該組全體成員皆不得申請退費。</p>
+        <p>4. 其餘通用條款維持不變。</p>
+
+        <h3>第四條 乙方之義務與個人資料提供</h3>
+        <p>1. 乙方同意提供真實之個人健檢數據、生活習慣資訊予甲方，以利元馨醫管家AI平台進行精準分析。</p>
+        <p>2. 乙方應確保其提供之資訊真實性。若因資訊不實導致 AI 分析誤差，甲方不負擔損害賠償責任。</p>
+
+        <h3>第五條 個人資料保護與資安承諾</h3>
+        <p>1. 甲方應嚴格遵守《個人資料保護法》，乙方之健康數據僅供本計畫服務人員與元馨醫管家AI系統使用。</p>
+        <p>2. 甲方採用金融級資安防護措施，確保乙方敏感個資不外洩。</p>
+
+        <h3>第六條 退費與終止規定 (依消保法)</h3>
+        <p>1. 猶豫期：乙方於繳費後7日內(且未啟動任何醫管家諮詢服務前)，得申請全額退費。</p>
+        <p>2. 合約履行與不可退費說明：鑑於本服務包含客製化 AI 系統設定及醫院醫療資源預約成本，凡發生以下任一情事，即視為「服務已啟動並進入正式執行階段」，恕不接受中途終止退費：<br>(A) 乙方繳費已超過 7 日猶豫期。<br>(B) 乙方已成功啟動「元馨醫管家」官方Line或登入紀錄。<br>(C) 乙方已進行首次醫管家諮詢或使用醫院綠色通道相關服務。</p>
+
+        <h3>第七條 爭議處理</h3>
+        <p>如因本協議產生爭議，雙方應先行友好協商。若協商不成，雙方同意以台灣台北地方法院為第一審管轄法院。</p>
     </div>
 
     <div class="mt-10 bg-teal-50/50 p-5 md:p-8 rounded-xl border border-teal-100">
@@ -81,12 +107,12 @@
                     <input type="text" id="memberID" required maxlength="10" placeholder="例如：A123456789" class="w-full p-2.5 border border-slate-300 rounded focus:border-teal-500 focus:outline-none uppercase" oninput="this.value = this.value.toUpperCase()">
                 </div>
                 <div>
-                    <label class="block text-sm font-bold mb-1 text-slate-700">聯絡信箱 <span class="text-red-500">*</span></label>
-                    <input type="email" id="memberEmail" required class="w-full p-2.5 border border-slate-300 rounded focus:border-teal-500 focus:outline-none" placeholder="接收合約副本用">
-                </div>
-                <div>
                     <label class="block text-sm font-bold mb-1 text-slate-700">聯絡電話 <span class="text-red-500">*</span></label>
                     <input type="tel" id="memberPhone" required class="w-full p-2.5 border border-slate-300 rounded focus:border-teal-500 focus:outline-none" placeholder="例如：0912345678">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold mb-1 text-slate-700">聯絡信箱 <span class="text-red-500">*</span></label>
+                    <input type="email" id="memberEmail" required class="w-full p-2.5 border border-slate-300 rounded focus:border-teal-500 focus:outline-none" placeholder="接收合約副本用">
                 </div>
                 <div class="md:col-span-2">
                     <label class="block text-sm font-bold mb-1 text-slate-700">通訊地址 <span class="text-red-500">*</span></label>
@@ -136,7 +162,13 @@
 
 <script>
     const today = new Date();
-    const formatDate = (d) => `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
+    const nextYear = new Date(today);
+    nextYear.setFullYear(today.getFullYear() + 1);
+    nextYear.setDate(today.getDate() - 1);
+    const formatDate = (d) => `${d.getFullYear()} 年 ${d.getMonth()+1} 月 ${d.getDate()} 日`;
+    
+    document.getElementById('start-date').innerText = formatDate(today);
+    document.getElementById('end-date').innerText = formatDate(nextYear);
     document.getElementById('sign-date').innerText = formatDate(today);
 
     // 解決注音輸入法提早同步問題
@@ -218,6 +250,8 @@
             "購買方案": document.getElementById('planType').value,
             "專屬服務顧問": document.getElementById('consultantName').value,
             "簽署日期": document.getElementById('sign-date').innerText,
+            "合約生效日": document.getElementById('start-date').innerText,
+            "合約到期日": document.getElementById('end-date').innerText,
             signatureBase64: signatureImage
         };
 
