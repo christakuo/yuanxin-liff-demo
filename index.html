@@ -7,6 +7,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script>
+    window.YUANXIN_REFERRAL_CONFIG = {
+        webhookUrl: 'https://script.google.com/macros/s/AKfycbzH9C8aAoKTe84HxVATJMdjbCcPu8iaadSEVdLXe_JuxLl4oVE6o6RoizKHgbl5EnyO/exec'
+    };
+</script>
+<script src="./referral.js"></script>
     <style>
         body { background-color: #0B1120; color: #F8FAFC; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -207,6 +213,21 @@
                     const profile = await liff.getProfile();
                     const lineUid = profile.userId;
                     const lineName = profile.displayName;
+                    const lineAccessToken = liff.getAccessToken() || '';
+
+try {
+    await YuanxinReferral.sendReferralEvent({
+        action: 'bind_line_referral',
+        eventType: 'line_bind',
+        lineUserId: lineUid,
+        lineDisplayName: lineName,
+        lineAccessToken: lineAccessToken,
+        pageName: 'yuanxin-liff-demo-index',
+        sourceChannel: 'LINE_LIFF'
+    });
+} catch (webhookError) {
+    console.error('中央推薦碼 Webhook 傳送失敗：', webhookError);
+}
 
                     // 2. 打包資料準備寄信
                     const data = {
