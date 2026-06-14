@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>元馨醫管家 - AI深度解析報告</title>
+    <title>元馨醫管家</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -270,10 +270,11 @@
             try {
                 await liff.init({ liffId: LIFF_ID });
 
-                if (isConsultantPortalMode()) {
-                    switchScreen('screen-consultant-portal');
-                    await loadConsultantPortal();
-                }
+               if (isConsultantPortalMode()) {
+    document.title = '元馨醫管家｜顧問業務大廳';
+    switchScreen('screen-consultant-portal');
+    await loadConsultantPortal();
+}
             } catch (err) {
                 console.error("LIFF Error", err);
 
