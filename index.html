@@ -136,6 +136,34 @@
                     <div id="portalTeamLeadsList" class="space-y-3"></div>
                 </div>
 
+                <section class="mt-8">
+                    <div class="flex items-end justify-between gap-3 mb-3 px-1">
+                        <div>
+                            <p class="text-teal-400 text-[10px] font-bold tracking-widest mb-1">CONSULTANT RESOURCES</p>
+                            <h3 class="text-white font-bold text-base">顧問資源中心</h3>
+                        </div>
+                        <p class="text-slate-500 text-[10px]">業務文件與推廣素材</p>
+                    </div>
+
+                    <div id="portalResourcesLoading" class="glass-card rounded-2xl p-5 text-center">
+                        <div class="w-8 h-8 rounded-full border-4 border-teal-400/30 border-t-teal-400 animate-spin mx-auto mb-3"></div>
+                        <p class="text-white font-bold text-sm">正在載入顧問資源</p>
+                        <p class="text-slate-400 text-xs mt-1">請稍候，系統正在整理可用資料。</p>
+                    </div>
+
+                    <div id="portalResourcesError" class="hidden glass-card rounded-2xl p-5 border border-red-500/30 bg-red-900/10">
+                        <p class="text-red-300 font-bold text-sm">顧問資源載入失敗</p>
+                        <p id="portalResourcesErrorText" class="text-slate-400 text-xs mt-2">請稍後再試，其他業務大廳功能仍可正常使用。</p>
+                    </div>
+
+                    <div id="portalResourcesEmpty" class="hidden glass-card rounded-2xl p-5 text-center">
+                        <p class="text-slate-300 text-sm font-bold">目前尚無可顯示的顧問資源</p>
+                        <p class="text-slate-500 text-xs mt-1">資源上架後會顯示在這裡。</p>
+                    </div>
+
+                    <div id="portalResourcesList" class="hidden space-y-3"></div>
+                </section>
+
                 <div class="mt-8 text-center pb-8">
                     <button onclick="switchScreen('screen-auth-demo')" class="text-slate-500 hover:text-slate-300 text-xs font-bold underline">返回會員首頁</button>
                 </div>
@@ -371,6 +399,11 @@
 
                 renderConsultantPortal(result);
                 setConsultantPortalState('content');
+                loadConsultantResources({
+                    lineUserId: profile.userId,
+                    lineDisplayName: profile.displayName,
+                    lineAccessToken: lineAccessToken
+                });
             } catch (error) {
                 console.error('顧問業務大廳載入失敗：', error);
                 showConsultantPortalError(error.message || '顧問業務大廳載入失敗，請稍後再試。');
@@ -457,6 +490,155 @@
                     tab.classList.toggle('text-slate-300', !active);
                 }
             });
+        }
+
+        async function loadConsultantResources(identity) {
+            setConsultantResourcesState('loading');
+
+            try {
+                const result = await YuanxinReferral.queryConsultantPortal({
+                    action: 'getConsultantResources',
+                    lineUserId: identity.lineUserId || '',
+                    lineDisplayName: identity.lineDisplayName || '',
+                    lineAccessToken: identity.lineAccessToken || '',
+                    pageName: 'yuanxin-consultant-portal',
+                    sourceChannel: 'LINE_LIFF'
+                });
+
+                if (!result || result.authorized === false || result.success === false) {
+                    throw new Error(result && result.message ? result.message : '無法取得顧問資源');
+                }
+
+                renderConsultantResources(result.resources || []);
+            } catch (error) {
+                console.error('顧問資源中心載入失敗：', error);
+                showConsultantResourcesError(error.message || '請稍後再試。');
+            }
+        }
+
+        function setConsultantResourcesState(state) {
+            const loading = document.getElementById('portalResourcesLoading');
+            const error = document.getElementById('portalResourcesError');
+            const empty = document.getElementById('portalResourcesEmpty');
+            const list = document.getElementById('portalResourcesList');
+
+            loading.classList.toggle('hidden', state !== 'loading');
+            error.classList.toggle('hidden', state !== 'error');
+            empty.classList.toggle('hidden', state !== 'empty');
+            list.classList.toggle('hidden', state !== 'list');
+        }
+
+        function showConsultantResourcesError(message) {
+            document.getElementById('portalResourcesErrorText').innerText =
+                message || '請稍後再試，其他業務大廳功能仍可正常使用。';
+            setConsultantResourcesState('error');
+        }
+
+        function renderConsultantResources(resources) {
+            const container = document.getElementById('portalResourcesList');
+            const sortedResources = Array.isArray(resources)
+                ? resources.slice().sort((left, right) => {
+                    const leftOrder = Number(left.sortOrder);
+                    const rightOrder = Number(right.sortOrder);
+                    const safeLeftOrder = Number.isFinite(leftOrder) ? leftOrder : Number.MAX_SAFE_INTEGER;
+                    const safeRightOrder = Number.isFinite(rightOrder) ? rightOrder : Number.MAX_SAFE_INTEGER;
+
+                    return safeLeftOrder - safeRightOrder;
+                })
+                : [];
+
+            container.replaceChildren();
+
+            if (sortedResources.length === 0) {
+                setConsultantResourcesState('empty');
+                return;
+            }
+
+            sortedResources.forEach(resource => {
+                container.appendChild(createConsultantResourceCard(resource));
+            });
+
+            setConsultantResourcesState('list');
+        }
+
+        function createConsultantResourceCard(resource) {
+            const card = document.createElement('article');
+            card.className = 'glass-card rounded-2xl p-4';
+
+            const header = document.createElement('div');
+            header.className = 'flex justify-between gap-3 items-start';
+
+            const heading = document.createElement('div');
+            heading.className = 'min-w-0';
+
+            const category = document.createElement('p');
+            category.className = 'text-teal-400 text-[10px] font-bold tracking-wider mb-1';
+            category.textContent = resource.category || '未分類';
+
+            const title = document.createElement('h4');
+            title.className = 'text-white font-bold text-sm leading-relaxed';
+            title.textContent = resource.title || '未命名資源';
+
+            heading.appendChild(category);
+            heading.appendChild(title);
+
+            const type = document.createElement('span');
+            type.className = 'shrink-0 text-[10px] text-slate-300 border border-slate-600 px-2 py-1 rounded-md';
+            type.textContent = resource.type || '資源';
+
+            header.appendChild(heading);
+            header.appendChild(type);
+            card.appendChild(header);
+
+            const description = document.createElement('p');
+            description.className = 'text-slate-300 text-xs leading-relaxed mt-3';
+            description.textContent = resource.description || '目前尚無簡介。';
+            card.appendChild(description);
+
+            const accessType = String(resource.accessType || '');
+            const accessLabel = document.createElement('p');
+            accessLabel.className = 'text-slate-400 text-[11px] mt-3';
+            accessLabel.textContent = `權限類型：${accessType || '未標記'}`;
+            card.appendChild(accessLabel);
+
+            const accessHint = document.createElement('p');
+            accessHint.className = accessType === '公開連結'
+                ? 'text-emerald-300 text-[11px] mt-1'
+                : 'text-amber-300 text-[11px] mt-1';
+            accessHint.textContent = accessType === '公開連結'
+                ? '可轉發給會員或潛在客戶。'
+                : accessType === '顧問限定'
+                    ? '顧問限定資料，請確認已完成授權。'
+                    : `權限類型：${accessType || '未標記'}`;
+            card.appendChild(accessHint);
+
+            const footer = document.createElement('div');
+            footer.className = 'flex justify-between gap-3 items-end mt-4 pt-3 border-t border-slate-700/60';
+
+            const updatedAt = document.createElement('p');
+            updatedAt.className = 'text-slate-500 text-[10px]';
+            updatedAt.textContent = `最後更新：${resource.updatedAt || '未提供'}`;
+
+            const button = document.createElement('button');
+            const fileUrl = String(resource.fileUrl || '').trim();
+            button.type = 'button';
+            button.className = fileUrl
+                ? 'shrink-0 bg-teal-500 hover:bg-teal-400 text-white text-xs font-bold px-4 py-2 rounded-xl'
+                : 'shrink-0 bg-slate-700 text-slate-400 text-xs font-bold px-4 py-2 rounded-xl cursor-not-allowed';
+            button.textContent = fileUrl ? '開啟資源' : '尚未提供連結';
+            button.disabled = !fileUrl;
+
+            if (fileUrl) {
+                button.addEventListener('click', () => {
+                    window.open(fileUrl, '_blank', 'noopener,noreferrer');
+                });
+            }
+
+            footer.appendChild(updatedAt);
+            footer.appendChild(button);
+            card.appendChild(footer);
+
+            return card;
         }
 
         function renderLeadList(containerId, leads, showOwner) {
