@@ -8,16 +8,17 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script>
-    window.YUANXIN_REFERRAL_CONFIG = {
-        webhookUrl: 'https://script.google.com/macros/s/AKfycbzH9C8aAoKTe84HxVATJMdjbCcPu8iaadSEVdLXe_JuxLl4oVE6o6RoizKHgbl5EnyO/exec'
-    };
-</script>
-<script src="./referral.js"></script>
+        window.YUANXIN_REFERRAL_CONFIG = {
+            webhookUrl: 'https://script.google.com/macros/s/AKfycbzH9C8aAoKTe84HxVATJMdjbCcPu8iaadSEVdLXe_JuxLl4oVE6o6RoizKHgbl5EnyO/exec'
+        };
+    </script>
+    <script src="./referral.js"></script>
     <style>
         body { background-color: #0B1120; color: #F8FAFC; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); }
+        .portal-pill { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(148, 163, 184, 0.18); }
     </style>
 </head>
 <body class="flex justify-center items-center min-h-screen">
@@ -26,6 +27,7 @@
         
         <div class="absolute top-0 left-0 w-full h-96 bg-blue-900/20 rounded-full blur-3xl -translate-y-1/2 pointer-events-none"></div>
 
+        <!-- 一般會員 / Demo 首頁 -->
         <div id="screen-auth-demo" class="block h-screen flex flex-col justify-center px-6 relative z-10">
             <div class="text-center mb-8">
                 <p class="text-teal-400 text-sm font-semibold tracking-widest mb-2">YUANXIN HEALTHCARE</p>
@@ -44,6 +46,97 @@
             </div>
         </div>
 
+        <!-- 顧問業務大廳 -->
+        <div id="screen-consultant-portal" class="hidden px-5 pt-10 relative z-10 min-h-screen">
+            <div class="mb-6">
+                <p class="text-teal-400 text-xs font-semibold tracking-widest mb-2">YUANXIN CONSULTANT PORTAL</p>
+                <h1 class="text-2xl font-bold text-white tracking-wide">元馨醫管家｜顧問業務大廳</h1>
+                <p id="consultantPortalSubtitle" class="text-slate-400 text-xs mt-2">正在確認您的顧問權限...</p>
+            </div>
+
+            <div id="consultantPortalLoading" class="glass-card rounded-3xl p-6 text-center">
+                <div class="w-12 h-12 rounded-full border-4 border-teal-400/30 border-t-teal-400 animate-spin mx-auto mb-4"></div>
+                <p class="text-white font-bold text-sm">正在載入顧問資料</p>
+                <p class="text-slate-400 text-xs mt-2">請稍候，系統正在確認 LINE 身分與權限。</p>
+            </div>
+
+            <div id="consultantPortalError" class="hidden glass-card rounded-3xl p-6 border border-red-500/30 bg-red-900/10">
+                <h2 class="text-red-300 font-bold text-lg mb-2">無法進入顧問業務大廳</h2>
+                <p id="consultantPortalErrorText" class="text-slate-300 text-sm leading-relaxed"></p>
+                <button onclick="switchScreen('screen-auth-demo')" class="mt-5 w-full bg-slate-800 border border-slate-600 text-slate-200 font-bold py-3 px-4 rounded-xl">
+                    返回會員首頁
+                </button>
+            </div>
+
+            <div id="consultantPortalContent" class="hidden">
+                <div class="glass-card rounded-3xl p-5 mb-5 border border-teal-500/20">
+                    <div class="flex justify-between gap-3 items-start">
+                        <div>
+                            <p class="text-slate-400 text-xs mb-1">您好</p>
+                            <h2 id="portalConsultantName" class="text-white text-xl font-bold">顧問</h2>
+                            <p id="portalConsultantMeta" class="text-teal-400 text-xs mt-1"></p>
+                        </div>
+                        <div id="portalMentorBadge" class="hidden text-xs font-bold text-amber-300 border border-amber-300/30 px-2 py-1 rounded-md bg-amber-500/10">導師權限</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mb-5">
+                    <div class="glass-card rounded-2xl p-4">
+                        <p class="text-slate-400 text-xs font-bold mb-1">我的推薦名單</p>
+                        <p id="summaryMyLeadCount" class="text-2xl font-black text-white">0</p>
+                        <p class="text-[10px] text-teal-400 mt-1">潛在會員</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4">
+                        <p class="text-slate-400 text-xs font-bold mb-1">我的推薦顧問</p>
+                        <p id="summaryMyConsultantCount" class="text-2xl font-black text-white">0</p>
+                        <p class="text-[10px] text-teal-400 mt-1">直接推薦</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4">
+                        <p class="text-slate-400 text-xs font-bold mb-1">團隊顧問</p>
+                        <p id="summaryTeamConsultantCount" class="text-2xl font-black text-white">0</p>
+                        <p class="text-[10px] text-amber-400 mt-1">導師視角</p>
+                    </div>
+                    <div class="glass-card rounded-2xl p-4">
+                        <p class="text-slate-400 text-xs font-bold mb-1">團隊會員名單</p>
+                        <p id="summaryTeamLeadCount" class="text-2xl font-black text-white">0</p>
+                        <p class="text-[10px] text-amber-400 mt-1">旗下顧問推薦</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 overflow-x-auto no-scrollbar mb-5 pb-1">
+                    <button onclick="showPortalTab('myLeads')" id="tab-myLeads" class="portal-tab shrink-0 bg-teal-500 text-white text-xs font-bold px-4 py-2 rounded-full">
+                        我的推薦名單
+                    </button>
+                    <button onclick="showPortalTab('myConsultants')" id="tab-myConsultants" class="portal-tab shrink-0 portal-pill text-slate-300 text-xs font-bold px-4 py-2 rounded-full">
+                        我的推薦顧問
+                    </button>
+                    <button onclick="showPortalTab('teamLeads')" id="tab-teamLeads" class="portal-tab shrink-0 portal-pill text-slate-300 text-xs font-bold px-4 py-2 rounded-full">
+                        團隊會員
+                    </button>
+                </div>
+
+                <div id="portalSectionMyLeads" class="portal-section">
+                    <h3 class="text-white font-bold text-sm mb-3 pl-1">我的推薦名單</h3>
+                    <div id="portalMyLeadsList" class="space-y-3"></div>
+                </div>
+
+                <div id="portalSectionMyConsultants" class="portal-section hidden">
+                    <h3 class="text-white font-bold text-sm mb-3 pl-1">我的推薦顧問</h3>
+                    <div id="portalMyConsultantsList" class="space-y-3"></div>
+                </div>
+
+                <div id="portalSectionTeamLeads" class="portal-section hidden">
+                    <h3 class="text-white font-bold text-sm mb-3 pl-1">旗下顧問推薦會員</h3>
+                    <div id="portalTeamLeadsList" class="space-y-3"></div>
+                </div>
+
+                <div class="mt-8 text-center pb-8">
+                    <button onclick="switchScreen('screen-auth-demo')" class="text-slate-500 hover:text-slate-300 text-xs font-bold underline">返回會員首頁</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Demo Dashboard -->
         <div id="screen-dashboard" class="hidden px-5 pt-10 relative z-10">
             <div class="flex justify-between items-end mb-8 pl-2">
                 <div>
@@ -126,6 +219,7 @@
             </div>
         </div>
 
+        <!-- 真實身分驗證 -->
         <div id="screen-auth-real" class="hidden h-screen flex flex-col justify-center px-6 relative z-10">
             <div class="glass-card rounded-3xl p-8 border-t border-teal-500/30 shadow-[0_0_30px_rgba(45,212,191,0.1)]">
                 <div class="absolute top-4 right-5 text-xs font-bold text-amber-500 border border-amber-500/30 px-2 py-1 rounded-md bg-amber-500/10">正式解析</div>
@@ -143,6 +237,7 @@
             </div>
         </div>
 
+        <!-- 上傳報告 -->
         <div id="screen-upload" class="hidden px-5 pt-12 relative z-10 min-h-screen flex flex-col">
             <div class="glass-card rounded-2xl p-6 mb-8 border border-teal-500/30 shadow-[0_0_20px_rgba(45,212,191,0.15)] flex-1 text-center flex flex-col justify-center items-center">
                 
@@ -167,26 +262,295 @@
     </div>
 
     <script>
+        const LIFF_ID = "2009597152-9nSswjnk";
+        const CONSULTANT_PORTAL_PARAMS = ['portal', 'mode', 'view'];
+        let consultantDashboardCache = null;
+
         async function initializeLiff() {
             try {
-                await liff.init({ liffId: "2009597152-9nSswjnk" }); 
-            } catch (err) { console.error("LIFF Error", err); }
+                await liff.init({ liffId: LIFF_ID });
+
+                if (isConsultantPortalMode()) {
+                    switchScreen('screen-consultant-portal');
+                    await loadConsultantPortal();
+                }
+            } catch (err) {
+                console.error("LIFF Error", err);
+
+                if (isConsultantPortalMode()) {
+                    showConsultantPortalError('LIFF 初始化失敗，請確認您是從 LINE 官方帳號或 LIFF 連結開啟。');
+                }
+            }
         }
+
         initializeLiff();
 
+        function isConsultantPortalMode() {
+            const params = new URLSearchParams(window.location.search);
+
+            for (const key of CONSULTANT_PORTAL_PARAMS) {
+                const value = String(params.get(key) || '').toLowerCase();
+
+                if (
+                    value === 'consultant' ||
+                    value === 'portal' ||
+                    value === 'business' ||
+                    value === 'advisor'
+                ) {
+                    return true;
+                }
+            }
+
+            return window.location.hash === '#consultant-portal';
+        }
+
         function switchScreen(targetId) {
-            ['screen-auth-demo', 'screen-dashboard', 'screen-auth-real', 'screen-upload'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
-                document.getElementById(id).classList.remove('block');
+            [
+                'screen-auth-demo',
+                'screen-consultant-portal',
+                'screen-dashboard',
+                'screen-auth-real',
+                'screen-upload'
+            ].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.classList.add('hidden');
+                el.classList.remove('block');
             });
-            document.getElementById(targetId).classList.remove('hidden');
-            document.getElementById(targetId).classList.add('block');
+
+            const target = document.getElementById(targetId);
+            if (target) {
+                target.classList.remove('hidden');
+                target.classList.add('block');
+            }
             
             if (targetId === 'screen-dashboard') { 
                 initPremiumLineChart(); 
                 initRadarChart();
             }
+
             window.scrollTo(0, 0);
+        }
+
+        async function loadConsultantPortal() {
+            setConsultantPortalState('loading');
+
+            try {
+                if (!liff.isLoggedIn()) {
+                    liff.login({
+                        redirectUri: window.location.href
+                    });
+                    return;
+                }
+
+                const profile = await liff.getProfile();
+                const lineAccessToken = liff.getAccessToken() || '';
+
+                const result = await YuanxinReferral.queryConsultantPortal({
+                    action: 'getConsultantDashboard',
+                    lineUserId: profile.userId,
+                    lineDisplayName: profile.displayName,
+                    lineAccessToken: lineAccessToken,
+                    pageName: 'yuanxin-consultant-portal',
+                    sourceChannel: 'LINE_LIFF'
+                });
+
+                consultantDashboardCache = result;
+
+                if (!result || result.authorized === false || result.success === false) {
+                    showConsultantPortalError(result && result.message ? result.message : '您目前尚未開通顧問權限。');
+                    return;
+                }
+
+                renderConsultantPortal(result);
+                setConsultantPortalState('content');
+            } catch (error) {
+                console.error('顧問業務大廳載入失敗：', error);
+                showConsultantPortalError(error.message || '顧問業務大廳載入失敗，請稍後再試。');
+            }
+        }
+
+        function setConsultantPortalState(state) {
+            const loading = document.getElementById('consultantPortalLoading');
+            const error = document.getElementById('consultantPortalError');
+            const content = document.getElementById('consultantPortalContent');
+
+            loading.classList.toggle('hidden', state !== 'loading');
+            error.classList.toggle('hidden', state !== 'error');
+            content.classList.toggle('hidden', state !== 'content');
+        }
+
+        function showConsultantPortalError(message) {
+            document.getElementById('consultantPortalSubtitle').innerText = '無法完成顧問權限確認';
+            document.getElementById('consultantPortalErrorText').innerText = message || '請聯繫元馨醫管家管理員。';
+            setConsultantPortalState('error');
+        }
+
+        function renderConsultantPortal(data) {
+            const consultant = data.consultant || {};
+            const summary = data.summary || {};
+
+            document.getElementById('consultantPortalSubtitle').innerText = '顧問權限已確認';
+            document.getElementById('portalConsultantName').innerText =
+                consultant.consultantName || consultant.lineDisplayName || '顧問';
+
+            document.getElementById('portalConsultantMeta').innerText =
+                `${consultant.consultantId || ''}｜${consultant.consultantRank || '顧問'}｜${consultant.consultantStatus || ''}`;
+
+            document.getElementById('portalMentorBadge').classList.toggle(
+                'hidden',
+                !consultant.isMentor && !consultant.canViewTeam
+            );
+
+            document.getElementById('summaryMyLeadCount').innerText =
+                String(summary.myLeadCount || 0);
+
+            document.getElementById('summaryMyConsultantCount').innerText =
+                String(summary.myConsultantCount || 0);
+
+            document.getElementById('summaryTeamConsultantCount').innerText =
+                String(summary.teamConsultantCount || summary.teamConsultantTotalCount || 0);
+
+            document.getElementById('summaryTeamLeadCount').innerText =
+                String(summary.teamLeadCount || 0);
+
+            renderLeadList('portalMyLeadsList', data.myLeads || [], false);
+            renderConsultantList('portalMyConsultantsList', data.myConsultants || []);
+            renderLeadList('portalTeamLeadsList', data.teamLeads || [], true);
+
+            if (!consultant.canViewTeam) {
+                document.getElementById('tab-teamLeads').classList.add('hidden');
+            } else {
+                document.getElementById('tab-teamLeads').classList.remove('hidden');
+            }
+
+            showPortalTab('myLeads');
+        }
+
+        function showPortalTab(tabName) {
+            const sections = {
+                myLeads: 'portalSectionMyLeads',
+                myConsultants: 'portalSectionMyConsultants',
+                teamLeads: 'portalSectionTeamLeads'
+            };
+
+            Object.keys(sections).forEach(key => {
+                const section = document.getElementById(sections[key]);
+                const tab = document.getElementById(`tab-${key}`);
+
+                if (section) {
+                    section.classList.toggle('hidden', key !== tabName);
+                }
+
+                if (tab) {
+                    const active = key === tabName;
+                    tab.classList.toggle('bg-teal-500', active);
+                    tab.classList.toggle('text-white', active);
+                    tab.classList.toggle('portal-pill', !active);
+                    tab.classList.toggle('text-slate-300', !active);
+                }
+            });
+        }
+
+        function renderLeadList(containerId, leads, showOwner) {
+            const container = document.getElementById(containerId);
+
+            if (!container) {
+                return;
+            }
+
+            if (!leads || leads.length === 0) {
+                container.innerHTML = renderEmptyState('目前尚無名單資料');
+                return;
+            }
+
+            container.innerHTML = leads.map(lead => {
+                const name = escapeHtml(lead.leadName || lead.lineDisplayName || '未填姓名');
+                const status = escapeHtml(lead.leadStatus || '未標記');
+                const phone = escapeHtml(lead.maskedPhone || '');
+                const time = escapeHtml(lead.lastInteractionAt || lead.firstVisitAt || '');
+                const source = escapeHtml(lead.sourcePage || lead.sourceChannel || '');
+                const owner = showOwner
+                    ? `<p class="text-[11px] text-amber-300 mt-1">歸屬顧問：${escapeHtml(lead.ownerConsultantName || lead.ownerConsultantId || '未標記')}</p>`
+                    : '';
+
+                return `
+                    <div class="glass-card rounded-2xl p-4">
+                        <div class="flex justify-between gap-3 items-start">
+                            <div>
+                                <h4 class="text-white font-bold text-sm">${name}</h4>
+                                <p class="text-slate-400 text-xs mt-1">${phone ? '手機：' + phone : '手機：未填寫'}</p>
+                                ${owner}
+                            </div>
+                            <span class="text-[10px] text-teal-300 border border-teal-300/30 px-2 py-1 rounded-md">${status}</span>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-slate-700/60">
+                            <p class="text-[11px] text-slate-400">來源：${source || '未標記'}</p>
+                            <p class="text-[11px] text-slate-500 mt-1">最近互動：${time || '尚無紀錄'}</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderConsultantList(containerId, consultants) {
+            const container = document.getElementById(containerId);
+
+            if (!container) {
+                return;
+            }
+
+            if (!consultants || consultants.length === 0) {
+                container.innerHTML = renderEmptyState('目前尚無推薦顧問資料');
+                return;
+            }
+
+            container.innerHTML = consultants.map(item => {
+                const name = escapeHtml(item.consultantName || item.lineDisplayName || '未填姓名');
+                const status = escapeHtml(item.consultantStatus || '未標記');
+                const rank = escapeHtml(item.consultantRank || '顧問');
+                const directDeals = escapeHtml(item.directMemberDealCount || '0');
+                const teamDeals = escapeHtml(item.teamMemberDealCount || '0');
+
+                return `
+                    <div class="glass-card rounded-2xl p-4">
+                        <div class="flex justify-between gap-3 items-start">
+                            <div>
+                                <h4 class="text-white font-bold text-sm">${name}</h4>
+                                <p class="text-slate-400 text-xs mt-1">${escapeHtml(item.consultantId || '')}｜${rank}</p>
+                            </div>
+                            <span class="text-[10px] text-teal-300 border border-teal-300/30 px-2 py-1 rounded-md">${status}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-3 pt-3 border-t border-slate-700/60">
+                            <div>
+                                <p class="text-[10px] text-slate-500">直接成交</p>
+                                <p class="text-white text-sm font-bold">${directDeals}</p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-slate-500">團隊成交</p>
+                                <p class="text-white text-sm font-bold">${teamDeals}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderEmptyState(message) {
+            return `
+                <div class="glass-card rounded-2xl p-5 text-center">
+                    <p class="text-slate-400 text-sm">${escapeHtml(message)}</p>
+                </div>
+            `;
+        }
+
+        function escapeHtml(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
         }
 
         function validateRealId() {
@@ -204,32 +568,30 @@
             }
         }
 
-        // 📲 LINE 原生上傳魔法 + 背景 Formspree 寄信功能 (完整保留版)
         async function sendLineMessageAndClose() {
             const idInput = document.getElementById('realIdInput').value.trim().toUpperCase();
+
             try {
                 if (liff.isInClient()) {
-                    // 1. 抓取客戶的 LINE 暱稱與 UID
                     const profile = await liff.getProfile();
                     const lineUid = profile.userId;
                     const lineName = profile.displayName;
                     const lineAccessToken = liff.getAccessToken() || '';
 
-try {
-    await YuanxinReferral.sendReferralEvent({
-        action: 'bind_line_referral',
-        eventType: 'line_bind',
-        lineUserId: lineUid,
-        lineDisplayName: lineName,
-        lineAccessToken: lineAccessToken,
-        pageName: 'yuanxin-liff-demo-index',
-        sourceChannel: 'LINE_LIFF'
-    });
-} catch (webhookError) {
-    console.error('中央推薦碼 Webhook 傳送失敗：', webhookError);
-}
+                    try {
+                        await YuanxinReferral.sendReferralEvent({
+                            action: 'bind_line_referral',
+                            eventType: 'line_bind',
+                            lineUserId: lineUid,
+                            lineDisplayName: lineName,
+                            lineAccessToken: lineAccessToken,
+                            pageName: 'yuanxin-liff-demo-index',
+                            sourceChannel: 'LINE_LIFF'
+                        });
+                    } catch (webhookError) {
+                        console.error('中央推薦碼 Webhook 傳送失敗：', webhookError);
+                    }
 
-                    // 2. 打包資料準備寄信
                     const data = {
                         "客戶LINE暱稱": lineName,
                         "真實身分證字號": idInput,
@@ -237,18 +599,17 @@ try {
                         "_subject": "【客戶綁定通知】有客戶準備上傳健檢報告！"
                     };
 
-                    // 3. 使用你已經成功接收過信件的 Formspree ID (xeepqlok)
                     fetch('https://formspree.io/f/xeepqlok', {
                         method: 'POST',
                         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
                         body: JSON.stringify(data)
                     }).catch(err => console.log('通知信發送失敗', err));
 
-                    // 4. 代發 LINE 訊息並關閉視窗
                     await liff.sendMessages([{
                         type: 'text',
                         text: `【建立專屬健康檔案】\n我的身分證字號：${idInput}\n\n(本訊息為系統自動代發)\n👇 請直接在此對話框，開始上傳您的健檢報告！\n\n💡 上傳教學：\n請點擊螢幕左下角的「＋」號：\n1. 若是紙本：請點選「拍照」或「相簿」\n2. 若是電子檔：請點選「檔案」(支援 PDF)\n\n上傳完成後，專屬顧問將盡快為您解析。`
                     }]);
+
                     liff.closeWindow();
                 } else {
                     alert('系統提醒：請在 LINE 手機 App 中開啟此功能，以進行報告上傳。');
@@ -259,31 +620,99 @@ try {
             }
         }
 
-        // --- 以下為圖表渲染邏輯 ---
         let isRadarChartRendered = false;
+
         function initRadarChart() {
             if (isRadarChartRendered) return;
-            const ctxRadar = document.getElementById('demoRadarChart').getContext('2d');
+
+            const canvas = document.getElementById('demoRadarChart');
+            if (!canvas) return;
+
+            const ctxRadar = canvas.getContext('2d');
             Chart.defaults.color = '#94a3b8';
+
             new Chart(ctxRadar, {
                 type: 'radar',
-                data: { labels: ['體重', '代謝', '睡眠', '壓力', '運動', '心血管'], datasets: [{ label: '分數', data: [80, 95, 85, 70, 90, 88], backgroundColor: 'rgba(59, 130, 246, 0.2)', borderColor: 'rgba(59, 130, 246, 1)', pointBackgroundColor: 'rgba(59, 130, 246, 1)', borderWidth: 2 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { min: 0, max: 100, ticks: { display: false }, grid: { color: 'rgba(255, 255, 255, 0.05)' }, angleLines: { color: 'rgba(255, 255, 255, 0.05)' }, pointLabels: { font: { size: 10 } } } } }
+                data: {
+                    labels: ['體重', '代謝', '睡眠', '壓力', '運動', '心血管'],
+                    datasets: [{
+                        label: '分數',
+                        data: [80, 95, 85, 70, 90, 88],
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 100,
+                            ticks: { display: false },
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            angleLines: { color: 'rgba(255, 255, 255, 0.05)' },
+                            pointLabels: { font: { size: 10 } }
+                        }
+                    }
+                }
             });
+
             isRadarChartRendered = true;
         }
 
         let isLineChartRendered = false;
+
         function initPremiumLineChart() {
             if (isLineChartRendered) return;
-            const ctxLine = document.getElementById('premiumLineChart').getContext('2d');
+
+            const canvas = document.getElementById('premiumLineChart');
+            if (!canvas) return;
+
+            const ctxLine = canvas.getContext('2d');
             let gradientLine = ctxLine.createLinearGradient(0, 0, 0, 200);
-            gradientLine.addColorStop(0, 'rgba(45, 212, 191, 0.5)'); gradientLine.addColorStop(1, 'rgba(45, 212, 191, 0.0)');
+            gradientLine.addColorStop(0, 'rgba(45, 212, 191, 0.5)');
+            gradientLine.addColorStop(1, 'rgba(45, 212, 191, 0.0)');
+
             new Chart(ctxLine, {
                 type: 'line',
-                data: { labels: ['2024', '2025', '2026'], datasets: [{ label: '空腹血糖', data: [108, 102, 95], borderColor: '#2DD4BF', backgroundColor: gradientLine, borderWidth: 3, pointBackgroundColor: '#0B1120', pointBorderColor: '#2DD4BF', pointBorderWidth: 2, pointRadius: 5, fill: true, tension: 0.4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } }, scales: { x: { grid: { display: false, drawBorder: false } }, y: { grid: { color: 'rgba(255, 255, 255, 0.05)', borderDash: [5, 5] }, min: 80, max: 120 } } }
+                data: {
+                    labels: ['2024', '2025', '2026'],
+                    datasets: [{
+                        label: '空腹血糖',
+                        data: [108, 102, 95],
+                        borderColor: '#2DD4BF',
+                        backgroundColor: gradientLine,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#0B1120',
+                        pointBorderColor: '#2DD4BF',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        x: { grid: { display: false, drawBorder: false } },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)', borderDash: [5, 5] },
+                            min: 80,
+                            max: 120
+                        }
+                    }
+                }
             });
+
             isLineChartRendered = true;
         }
     </script>
