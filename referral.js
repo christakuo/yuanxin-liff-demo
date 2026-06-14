@@ -119,6 +119,64 @@
         return result;
     }
 
+    /**
+     * Task 02B：
+     * 顧問業務大廳專用查詢。
+     *
+     * action 可用：
+     * - getConsultantDashboard
+     * - getMyLeads
+     * - getMyConsultants
+     * - getTeamLeads
+     *
+     * 正式 LIFF 前端會優先傳 lineAccessToken，
+     * 後端會用 LINE access token 驗證身份。
+     */
+    async function queryConsultantPortal(data = {}) {
+        const config = window.YUANXIN_REFERRAL_CONFIG || {};
+
+        if (!config.webhookUrl) {
+            throw new Error('尚未設定中央 Apps Script Web App URL');
+        }
+
+        const payload = {
+            action: data.action || 'getConsultantDashboard',
+            lineUserId: data.lineUserId || '',
+            lineDisplayName: data.lineDisplayName || '',
+            lineAccessToken: data.lineAccessToken || '',
+            pageName: data.pageName || 'yuanxin-consultant-portal',
+            sourceChannel: data.sourceChannel || 'LINE_LIFF',
+            userAgent: navigator.userAgent || '',
+            createdAt: new Date().toISOString()
+        };
+
+        debugLog('Query consultant portal:', {
+            ...payload,
+            lineAccessToken: payload.lineAccessToken ? '[REDACTED]' : ''
+        });
+
+        const response = await fetch(config.webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain;charset=utf-8'
+            },
+            body: JSON.stringify(payload),
+            redirect: 'follow'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Consultant portal HTTP error: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.status !== 'success' && result.success !== true) {
+            throw new Error(result.message || 'Consultant portal query failed');
+        }
+
+        return result;
+    }
+
     function setReferralDebug(enabled) {
         debugEnabled = Boolean(enabled);
     }
@@ -144,6 +202,10 @@
         clearReferralCode,
         buildReferralPayload,
         sendReferralEvent,
+
+        // Task 02B
+        queryConsultantPortal,
+
         setReferralDebug,
         initializeReferralTracking
     };
