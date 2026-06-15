@@ -10,6 +10,22 @@
 <meta property="og:description" content="元馨醫管家整合健康檢查、AI健康解析、會員健康管理與顧問服務，提供專業、溫暖且可信任的健康管理體驗。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="元馨醫管家">
+    <script>
+        window.YUANXIN_INITIAL_VIEW = (() => {
+            const params = new URLSearchParams(window.location.search);
+            const consultantPortalParams = ['portal', 'mode', 'view'];
+            const isConsultantPortal = consultantPortalParams.some(key => {
+                const value = String(params.get(key) || '').toLowerCase();
+                return ['consultant', 'portal', 'business', 'advisor'].includes(value);
+            }) || window.location.hash === '#consultant-portal';
+
+            if (isConsultantPortal) {
+                document.documentElement.classList.add('consultant-portal-initial');
+            }
+
+            return { isConsultantPortal };
+        })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -25,6 +41,8 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5); }
         .portal-pill { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(148, 163, 184, 0.18); }
+                html.consultant-portal-initial #screen-auth-demo { display: none !important; }
+        html.consultant-portal-initial #screen-consultant-portal { display: block !important; }
     </style>
 </head>
 <body class="flex justify-center items-center min-h-screen">
@@ -297,7 +315,6 @@
 
     <script>
         const LIFF_ID = "2009597152-9nSswjnk";
-        const CONSULTANT_PORTAL_PARAMS = ['portal', 'mode', 'view'];
         let consultantDashboardCache = null;
 
         async function initializeLiff() {
@@ -320,26 +337,15 @@
 
         initializeLiff();
 
-        function isConsultantPortalMode() {
-            const params = new URLSearchParams(window.location.search);
-
-            for (const key of CONSULTANT_PORTAL_PARAMS) {
-                const value = String(params.get(key) || '').toLowerCase();
-
-                if (
-                    value === 'consultant' ||
-                    value === 'portal' ||
-                    value === 'business' ||
-                    value === 'advisor'
-                ) {
-                    return true;
-                }
-            }
-
-            return window.location.hash === '#consultant-portal';
+                function isConsultantPortalMode() {
+            return Boolean(
+                window.YUANXIN_INITIAL_VIEW &&
+                window.YUANXIN_INITIAL_VIEW.isConsultantPortal
+            );
         }
 
         function switchScreen(targetId) {
+                        document.documentElement.classList.remove('consultant-portal-initial');
             [
                 'screen-auth-demo',
                 'screen-consultant-portal',
