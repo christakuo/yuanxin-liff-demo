@@ -3,6 +3,15 @@
 
     const STORAGE_KEY = 'yuanxin_referral_code';
     const REFERRAL_PATTERN = /^HC\d{4,}$/;
+    const TRACKING_QUERY_ALLOWLIST = new Set([
+        'ref',
+        'portal',
+        'utm_source',
+        'utm_medium',
+        'utm_campaign',
+        'event_code',
+        'campaign_code'
+    ]);
     let debugEnabled = false;
 
     function debugLog(...args) {
@@ -60,6 +69,30 @@
         return new URLSearchParams(window.location.search).get(name) || '';
     }
 
+    function sanitizeTrackingUrl(rawUrl) {
+        try {
+            const parsedUrl = new URL(String(rawUrl || '').trim());
+
+            if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+                return '';
+            }
+
+            const sanitizedUrl = new URL(
+                `${parsedUrl.origin}${parsedUrl.pathname}`
+            );
+
+            parsedUrl.searchParams.forEach((value, key) => {
+                if (TRACKING_QUERY_ALLOWLIST.has(key)) {
+                    sanitizedUrl.searchParams.append(key, value);
+                }
+            });
+
+            return sanitizedUrl.toString();
+        } catch (error) {
+            return '';
+        }
+    }
+
     function buildReferralPayload(data = {}) {
         return {
             action: data.action || 'referral_event',
@@ -72,8 +105,8 @@
             phone: data.phone || '',
             email: data.email || '',
             pageName: data.pageName || 'yuanxin-liff-demo-index',
-            pageUrl: window.location.href,
-            referrer: document.referrer || '',
+            pageUrl: sanitizeTrackingUrl(window.location.href),
+            referrer: sanitizeTrackingUrl(document.referrer),
             sourceChannel: data.sourceChannel || 'LINE_LIFF',
             utmSource: getQueryParameter('utm_source'),
             utmMedium: getQueryParameter('utm_medium'),
