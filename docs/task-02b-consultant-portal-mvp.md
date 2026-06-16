@@ -739,3 +739,53 @@ https://liff.line.me/2009597152-9nSswjnk?portal=consultant
 3. `Task 03C：組織與獎金儀表板`
 
 規劃 Task 03A 時，必須同步考量 Task 03B 所需的客戶狀態、聯繫紀錄、跟進時間、訊息授權及行銷流程資料，避免 CRM 完成後無法支援自動化行銷。
+
+## 十三、Task 03A-3：推薦事件安全修正與事件紀錄寫入修復
+
+完成日期：2026-06-16
+
+### 背景
+
+進行 Task 03A 顧問業務系統規劃前，先檢查推薦事件與名單追蹤安全性。
+
+本次發現兩項問題：
+
+1. `referral_events_推薦事件紀錄` 曾保存完整 LIFF 網址，可能包含 URL hash 中的授權資訊。
+2. 推薦事件寫入不是固定寫到底部，而是可能插入中間空白事件 ID 列。
+
+### 已完成修正
+
+已完成推薦事件網址前後端去敏：
+
+- Apps Script `EventService.gs` 新增後端網址去敏。
+- 正式前端 `referral.js` 新增前端網址去敏。
+- `pageUrl` 與 `referrer` 不再直接保存完整 `window.location.href` 或 `document.referrer`。
+- 僅保留 `ref`、`portal`、`utm_source`、`utm_medium`、`utm_campaign`、`event_code`、`campaign_code`。
+- 完整移除 URL hash。
+- 不保存 `access_token`、`id_token`、`context_token`。
+
+已完成推薦事件寫入修正：
+
+- Apps Script `SheetService.gs` 將推薦事件紀錄改為 append-only。
+- `referral_events_推薦事件紀錄` 後續固定新增到底部。
+- 避免事件資料插入中間空白列或覆寫既有測試資料。
+
+### 驗收結果
+
+- 後端去敏已部署並通過正式 LINE 實機驗證。
+- 前端去敏已 PR 合併並完成 Vercel Production 部署。
+- 正式 LINE 測試確認最新頁面網址無 `#` 或 Token。
+- `EV000072` 已確認寫入 `referral_events_推薦事件紀錄` 最底部。
+- 會員首頁正常。
+
+### 注意事項
+
+- 先前 `EV000069` / `EV000070` 屬測試期間資料異常，不再追修歷史測試資料。
+- `來源頁面` 空白屬 LINE / LIFF 可能不提供 `referrer` 的正常情況。
+- 本次未修改 LIFF ID、LINE metadata、Apps Script Web App URL 或 Google Sheet 結構。
+
+### 後續
+
+Task 03A 後續可回到會員成交漏斗、CRM 聯繫管理與自動化行銷流程規劃。
+
+若後續要處理正式資料治理，可另開任務清理既有敏感網址歷史資料。
