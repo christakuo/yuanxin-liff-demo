@@ -69,6 +69,16 @@
         return new URLSearchParams(window.location.search).get(name) || '';
     }
 
+    function getPortalMode() {
+        return String(getQueryParameter('portal'))
+            .trim()
+            .toLowerCase();
+    }
+
+    function isConsultantPortal() {
+        return getPortalMode() === 'consultant';
+    }
+
     function sanitizeTrackingUrl(rawUrl) {
         try {
             const parsedUrl = new URL(String(rawUrl || '').trim());
@@ -198,13 +208,17 @@
         });
 
         if (!response.ok) {
-            throw new Error(`Consultant portal HTTP error: ${response.status}`);
+            throw new Error(
+                `Consultant portal HTTP error: ${response.status}`
+            );
         }
 
         const result = await response.json();
 
         if (result.status !== 'success' && result.success !== true) {
-            throw new Error(result.message || 'Consultant portal query failed');
+            throw new Error(
+                result.message || 'Consultant portal query failed'
+            );
         }
 
         return result;
@@ -216,6 +230,13 @@
 
     function initializeReferralTracking() {
         getReferralCode();
+
+        if (isConsultantPortal()) {
+            debugLog(
+                'Consultant portal detected. Page-view referral event skipped.'
+            );
+            return;
+        }
 
         sendReferralEvent({
             action: 'referral_event',
@@ -238,6 +259,10 @@
 
         // Task 02B
         queryConsultantPortal,
+
+        // Task 03A
+        getPortalMode,
+        isConsultantPortal,
 
         setReferralDebug,
         initializeReferralTracking
