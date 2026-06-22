@@ -13,6 +13,7 @@
         'campaign_code'
     ]);
     let debugEnabled = false;
+    const initialIsConsultantPortal = readInitialConsultantPortal();
 
     function debugLog(...args) {
         if (debugEnabled) {
@@ -69,14 +70,30 @@
         return new URLSearchParams(window.location.search).get(name) || '';
     }
 
-    function getPortalMode() {
-        return String(getQueryParameter('portal'))
+    function normalizePortalMode(portal) {
+        return String(portal || '')
             .trim()
             .toLowerCase();
     }
 
+    function getPortalMode() {
+        return normalizePortalMode(getQueryParameter('portal'));
+    }
+
+    function readInitialConsultantPortal() {
+        const initialView = window.YUANXIN_INITIAL_VIEW || {};
+
+        if (typeof initialView.isConsultantPortal === 'boolean') {
+            return initialView.isConsultantPortal;
+        }
+
+        const params = new URLSearchParams(window.location.search);
+
+        return normalizePortalMode(params.get('portal')) === 'consultant';
+    }
+
     function isConsultantPortal() {
-        return getPortalMode() === 'consultant';
+        return initialIsConsultantPortal;
     }
 
     function sanitizeTrackingUrl(rawUrl) {
