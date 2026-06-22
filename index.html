@@ -12,12 +12,54 @@
 <meta property="og:site_name" content="元馨醫管家">
     <script>
         window.YUANXIN_INITIAL_VIEW = (() => {
+            const CONSULTANT_PORTAL_VALUES = [
+                'consultant',
+                'portal',
+                'business',
+                'advisor'
+            ];
+
+            function normalizePortalMode(portal) {
+                return String(portal || '')
+                    .trim()
+                    .toLowerCase();
+            }
+
+            function readPortalFromLiffState(liffState) {
+                const state = String(liffState || '').trim();
+
+                if (!state) {
+                    return '';
+                }
+
+                const queryStart = state.indexOf('?');
+                const queryString = queryStart >= 0
+                    ? state.slice(queryStart + 1)
+                    : state;
+                const stateParams = new URLSearchParams(queryString);
+
+                return normalizePortalMode(stateParams.get('portal'));
+            }
+
+            function getInitialPortalMode(params) {
+                const directPortal = params.get('portal');
+
+                if (directPortal !== null) {
+                    return normalizePortalMode(directPortal);
+                }
+
+                return readPortalFromLiffState(params.get('liff.state'));
+            }
+
             const params = new URLSearchParams(window.location.search);
-            const consultantPortalParams = ['portal', 'mode', 'view'];
+            const portalMode = getInitialPortalMode(params);
+            const consultantPortalParams = ['mode', 'view'];
             const isConsultantPortal = consultantPortalParams.some(key => {
                 const value = String(params.get(key) || '').toLowerCase();
-                return ['consultant', 'portal', 'business', 'advisor'].includes(value);
-            }) || window.location.hash === '#consultant-portal';
+                return CONSULTANT_PORTAL_VALUES.includes(value);
+            }) ||
+                CONSULTANT_PORTAL_VALUES.includes(portalMode) ||
+                window.location.hash === '#consultant-portal';
 
             if (isConsultantPortal) {
                 document.documentElement.classList.add('consultant-portal-initial');
