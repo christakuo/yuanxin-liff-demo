@@ -77,7 +77,35 @@
     }
 
     function getPortalMode() {
-        return normalizePortalMode(getQueryParameter('portal'));
+        const params = new URLSearchParams(window.location.search);
+
+        return readPortalModeFromParams(params);
+    }
+
+    function readPortalFromLiffState(liffState) {
+        const state = String(liffState || '').trim();
+
+        if (!state) {
+            return '';
+        }
+
+        const queryStart = state.indexOf('?');
+        const queryString = queryStart >= 0
+            ? state.slice(queryStart + 1)
+            : state;
+        const stateParams = new URLSearchParams(queryString);
+
+        return normalizePortalMode(stateParams.get('portal'));
+    }
+
+    function readPortalModeFromParams(params) {
+        const directPortal = params.get('portal');
+
+        if (directPortal !== null) {
+            return normalizePortalMode(directPortal);
+        }
+
+        return readPortalFromLiffState(params.get('liff.state'));
     }
 
     function readInitialConsultantPortal() {
@@ -89,7 +117,7 @@
 
         const params = new URLSearchParams(window.location.search);
 
-        return normalizePortalMode(params.get('portal')) === 'consultant';
+        return readPortalModeFromParams(params) === 'consultant';
     }
 
     function isConsultantPortal() {
