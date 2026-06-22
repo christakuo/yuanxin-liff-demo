@@ -482,3 +482,109 @@ Task 03A-14 已完成：
 1. 顧問大廳不寫入一般推薦事件。
 2. 顧問大廳載入效能優化。
 3. CRM 階段編輯與聯繫管理功能。
+
+## 二十一、Task 03A-15：排除顧問入口 page_view 推薦事件
+
+完成日期：2026-06-22
+
+### 1. 問題背景
+
+顧問大廳每次開啟時，也會被 referral.js 當成一般會員入口，向 referral_events_推薦事件紀錄寫入「進入頁面」事件。
+
+顧問大廳查詢本身使用 getConsultantDashboard、getConsultantResources 等顧問專用 action，不應被計入一般推薦 page_view。
+
+### 2. 修正內容
+
+- referral.js 新增 getPortalMode()。
+- referral.js 新增 isConsultantPortal()。
+- portal=consultant 時，initializeReferralTracking() 跳過 page_view。
+- window.YuanxinReferral 對外公開 getPortalMode 與 isConsultantPortal。
+- queryConsultantPortal()、推薦碼、LINE 綁定及其他追蹤功能不變。
+
+### 3. 檢查與初次驗證
+
+- JavaScript 語法檢查通過。
+- git diff --check 通過。
+- 修改檔案只有 referral.js。
+- 程式已合併至 main 並部署至 Vercel Production。
+- 顧問資料、推薦名單及顧問資源中心仍正常。
+- 正式測試仍產生 EV000088。
+- 後續確認不是顧問 API 寫入，而是顧問入口第一次載入仍送出 page_view。
+
+### 4. 階段結論
+
+Task 03A-15 完成直接 portal=consultant 的事件排除，但 LINE LIFF 的實際重導流程仍需進一步處理。
+
+## 二十二、Task 03A-16：固定顧問入口初始判斷
+
+完成日期：2026-06-22
+
+### 1. 問題背景
+
+referral.js 原本在 DOMContentLoaded 時重新讀取 window.location.search。若 LIFF 或重導過程改變網址，可能失去最初的 portal=consultant 判斷。
+
+### 2. 修正內容
+
+- referral.js 載入時立即保存初始顧問入口狀態。
+- 優先使用 window.YUANXIN_INITIAL_VIEW.isConsultantPortal。
+- 若沒有既有初始判斷，再讀取初始網址 portal。
+- isConsultantPortal() 改為回傳固定初始狀態。
+- 後續網址變動不再影響顧問入口判斷。
+- 一般會員入口、queryConsultantPortal、推薦碼及 LINE 綁定流程不變。
+
+### 3. 檢查與正式驗證
+
+- JavaScript 語法檢查通過。
+- git diff --check 通過。
+- 修改檔案只有 referral.js。
+- 程式已合併至 main 並部署至 Vercel Production。
+- 線上 referral.js 已確認包含 initialIsConsultantPortal。
+- 實際測試仍產生 EV000089。
+- EV000089 的頁面網址只有 https://yuanxin-liff-demo.vercel.app/，沒有 portal=consultant。
+
+### 4. 階段結論
+
+Task 03A-16 排除了 DOMContentLoaded 前後網址變動的影響，並進一步確認真正原因是 LINE LIFF 第一次載入時將 portal 參數包入 liff.state。
+
+## 二十三、Task 03A-17：支援 LIFF liff.state 顧問入口判斷
+
+完成日期：2026-06-22
+
+### 1. 正式入口與根因
+
+正式顧問入口：
+
+https://liff.line.me/2009597152-9nSswjnk?portal=consultant
+
+LINE LIFF 第一次載入 Endpoint URL 時，會將 portal=consultant 包入 liff.state。原本 index.html 與 referral.js 只讀取直接的 portal，因此第一次載入時被誤判為一般會員入口並送出 page_view。
+
+### 2. 修正內容
+
+- index.html 最早期 YUANXIN_INITIAL_VIEW 判斷支援 liff.state。
+- referral.js 初始顧問入口判斷支援 liff.state。
+- 直接 portal 參數仍具有優先權。
+- 支援 liff.state 中的 ?portal=consultant、portal=consultant、/?portal=consultant。
+- portal 比對忽略前後空白及英文大小寫。
+- liff.state 不加入追蹤網址白名單，也不寫入 referral_events。
+- 一般會員入口 page_view、queryConsultantPortal、推薦碼及 LINE 綁定流程不變。
+
+### 3. 程式檢查
+
+- JavaScript 語法檢查通過。
+- index.html 內嵌 JavaScript 語法檢查通過。
+- git diff --check 通過。
+- 六項 portal 與 liff.state 情境測試全部通過。
+- 修改檔案只有 index.html 與 referral.js。
+
+### 4. 正式環境驗收
+
+- 程式已合併至 main。
+- Vercel Production 已完成部署。
+- 使用正式 LIFF 顧問入口重複開啟測試。
+- 顧問大廳功能正常。
+- referral_events_推薦事件紀錄沒有新增。
+- leads_潛在會員名單沒有誤新增。
+
+### 5. 最終結論
+
+Task 03A-17 正式驗收通過。顧問入口不再被誤計為一般推薦 page_view，也不會誤建立潛在會員名單。
