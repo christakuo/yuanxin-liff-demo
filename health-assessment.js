@@ -1,8 +1,11 @@
 (function () {
     'use strict';
 
+    const HEALTH_ASSESSMENT_API_ENDPOINT = '/api/submit-health-assessment';
+    const CONSENT_VERSION = '2026-06-23-v1';
     const EXCLUSIVE_OPTIONS = new Set(['none', 'good']);
     const MAX_Q05_SELECTIONS = 3;
+    const DEFAULT_MODAL_TEXT = '我同意由元馨醫管家依本次評估結果提供健康資訊與諮詢建議。';
 
     const questions = [
         {
@@ -209,7 +212,12 @@
         currentIndex: 0,
         answers: {},
         result: null,
-        sourceContext
+        sourceContext,
+        submission: {
+            inFlight: false,
+            submitted: false,
+            assessmentId: ''
+        }
     };
 
     const els = {};
@@ -257,6 +265,8 @@
         ].forEach(id => {
             els[id] = document.getElementById(id);
         });
+
+        els.modalDescription = els.ctaModal.querySelector('p');
     }
 
     function bindEvents() {
@@ -270,15 +280,16 @@
         els.secondaryCtaButton.addEventListener('click', showSecondaryMock);
         els.restartButton.addEventListener('click', restart);
         els.modalCancelButton.addEventListener('click', closeModal);
-        els.modalConfirmButton.addEventListener('click', showPrimaryMock);
+        els.modalConfirmButton.addEventListener('click', submitPrimaryCta);
         els.backToResultButton.addEventListener('click', () => showScreen('result'));
     }
 
     function readSourceContext() {
         const params = new URLSearchParams(window.location.search);
-        const pageUrl = `${window.location.origin}${window.location.pathname}${window.location.search}`;
+        const pageUrl = stripHash(window.location.href);
 
         return {
+            entryType: inferEntryType(params),
             referralCode: normalizeReferralCode(params.get('ref')),
             utmSource: params.get('utm_source') || '',
             utmMedium: params.get('utm_medium') || '',
@@ -287,8 +298,33 @@
             campaignCode: params.get('campaign_code') || '',
             portal: params.get('portal') || '',
             source: params.get('source') || '',
-            pageUrl
+            pageUrl,
+            referrer: stripHash(document.referrer || '')
         };
+    }
+
+    function inferEntryType(params) {
+        const portal = params.get('portal') || '';
+        const source = params.get('source') || '';
+        const ref = params.get('ref') || '';
+
+        if (portal === 'consultant' || ref) {
+            return 'consultant_referral';
+        }
+
+        if (source === 'line' || source === 'official_line') {
+            return 'official_line';
+        }
+
+        if (params.get('utm_source') || params.get('campaign_code') || params.get('event_code')) {
+            return 'campaign';
+        }
+
+        return 'external_anonymous';
+    }
+
+    function stripHash(value) {
+        return String(value || '').split('#')[0];
     }
 
     function normalizeReferralCode(value) {
@@ -537,6 +573,7 @@
     }
 
     function openModal() {
+        resetModalState();
         els.ctaModal.classList.remove('hidden');
         els.ctaModal.classList.add('flex');
     }
@@ -546,19 +583,185 @@
         els.ctaModal.classList.remove('flex');
     }
 
-    function showPrimaryMock() {
-        closeModal();
-        showMockComplete(
-            '已收到您的健康建議需求',
-            '這是 Task 03B-2 前端模擬流程，目前尚未送出資料或建立名單。正式送出、健康評估紀錄與 CRM 銜接將於 Task 03B-3 / Task 03B-4 實作。'
-        );
+    function resetModalState() {
+        els.modalDescription.textContent = DEFAULT_MODAL_TEXT;
+        els.modalConfirmButton.textContent = state.submission.submitted ? '已完成測試送出' : '同意並送出';
+        els.modalConfirmButton.disabled = state.submission.submitted || state.submission.inFlight;
+        els.modalCancelButton.disabled = state.submission.inFlight;
+    }
+
+    async function submitPrimaryCta() {
+        if (state.submission.inFlight || state.submission.submitted) {
+            return;
+        }
+
+        if (!state.result) {
+            showModalError('尚未完成評估，請先完成 12 題後再送出。');
+            return;
+        }
+
+        const consentAt = new Date().toISOString();
+        const payload = buildHealthAssessmentPayload(consentAt);
+
+        state.submission.inFlight = true;
+        els.modalConfirmButton.disabled = true;
+        els.modalCancelButton.disabled = true;
+        els.modalConfirmButton.textContent = '送出中...';
+        els.modalDescription.textContent = '正在送出 Task 03B-3B 測試資料，請稍候。';
+
+        try {
+            const response = await fetch(HEALTH_ASSESSMENT_API_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const responseText = await response.text();
+            let data = {};
+
+            try {
+                data = responseText ? JSON.parse(responseText) : {};
+            } catch (parseError) {
+                throw new Error('API 回傳內容不是有效 JSON。');
+            }
+
+            if (!response.ok || data.status !== 'success') {
+                throw new Error(data.message || data.error || `API 回傳失敗狀態：${response.status}`);
+            }
+
+            state.submission.submitted = true;
+            state.submission.assessmentId = data.assessmentId || '';
+            closeModal();
+            showMockComplete(
+                'Task 03B-3B 測試送出成功',
+                `這是 Task 03B-3B 測試送出，資料已以測試資料寫入健康評估紀錄；目前尚未建立 CRM 名單。健康評估ID：${state.submission.assessmentId || '未回傳'}`
+            );
+        } catch (error) {
+            state.submission.inFlight = false;
+            els.modalConfirmButton.disabled = false;
+            els.modalCancelButton.disabled = false;
+            els.modalConfirmButton.textContent = '重新送出';
+            showModalError(`送出失敗：${error.message || '請稍後再試'}。您仍保留在結果頁，答案不會被清空。`);
+        }
+    }
+
+    function showModalError(message) {
+        els.modalDescription.textContent = message;
     }
 
     function showSecondaryMock() {
         showMockComplete(
             '健康資訊入口將於後續任務串接',
-            '這是 Task 03B-2 前端模擬流程，沒有跳轉 LINE、顧問入口、Google Sheet 或任何外部服務。'
+            '這是 Task 03B-3B 前端保留的次要 CTA mock，沒有呼叫 API、跳轉 LINE、建立名單或寫入資料。'
         );
+    }
+
+    function buildHealthAssessmentPayload(consentAt) {
+        const copy = resultCopy[state.result.level];
+        const focusAreaNames = state.result.focusAreas.map(area => area.name);
+
+        return {
+            action: 'submit_health_assessment',
+            assessmentId: '',
+            identity: {
+                identityStatus: 'anonymous',
+                lineUserId: '',
+                lineDisplayName: '',
+                userName: '',
+                phone: '',
+                email: ''
+            },
+            answers: buildAnswersPayload(),
+            result: {
+                score: state.result.total,
+                level: state.result.level,
+                resultCode: state.result.level,
+                resultTitle: copy.title,
+                primaryConcernAreas: focusAreaNames.slice(0, 2),
+                secondaryConcernAreas: focusAreaNames.slice(2),
+                mainHealthConcerns: focusAreaNames.join('、') || '建立年度健康基準',
+                summary: copy.summary,
+                followUpFocus: buildFollowUpFocus(focusAreaNames),
+                priorityConsultationRecommended: ['L3', 'L4'].includes(state.result.level),
+                consultationIntentLevel: state.result.consultationIntent,
+                primaryCta: copy.primaryCta,
+                secondaryCta: copy.secondaryCta
+            },
+            consent: {
+                dataCollectionConsent: true,
+                dataCollectionConsentVersion: CONSENT_VERSION,
+                dataCollectionConsentAt: consentAt,
+                healthDataUseConsent: true,
+                healthDataUseConsentVersion: CONSENT_VERSION,
+                healthDataUseConsentAt: consentAt,
+                healthAdviceConsent: true,
+                healthAdviceConsentVersion: CONSENT_VERSION,
+                healthAdviceConsentAt: consentAt
+            },
+            sourceContext: {
+                entryType: state.sourceContext.entryType,
+                referralCode: state.sourceContext.referralCode,
+                utmSource: state.sourceContext.utmSource,
+                utmMedium: state.sourceContext.utmMedium,
+                utmCampaign: state.sourceContext.utmCampaign,
+                eventCode: state.sourceContext.eventCode,
+                campaignCode: state.sourceContext.campaignCode,
+                portal: state.sourceContext.portal,
+                source: state.sourceContext.source,
+                pageUrl: state.sourceContext.pageUrl,
+                referrer: state.sourceContext.referrer
+            },
+            client: {
+                userAgent: navigator.userAgent || '',
+                deviceType: '',
+                operatingSystem: '',
+                browser: ''
+            },
+            isTestData: true
+        };
+    }
+
+    function buildAnswersPayload() {
+        return questions.reduce((payload, question) => {
+            const selectedOptions = getSelectedOptions(question);
+            payload[question.id] = question.type === 'multi'
+                ? selectedOptions.map(optionToPayload)
+                : optionToPayload(selectedOptions[0]);
+            return payload;
+        }, {});
+    }
+
+    function getSelectedOptions(question) {
+        const answer = state.answers[question.id] || [];
+        return question.options.filter(option => answer.includes(option.id));
+    }
+
+    function optionToPayload(option) {
+        if (!option) {
+            return { value: '', label: '', score: 0 };
+        }
+
+        const payload = {
+            value: option.id,
+            label: option.label,
+            score: Number(option.score || 0)
+        };
+
+        if (option.intent) {
+            payload.intentLevel = option.intent;
+        }
+
+        return payload;
+    }
+
+    function buildFollowUpFocus(focusAreaNames) {
+        if (focusAreaNames.length === 0) {
+            return '建議協助會員建立年度健康追蹤基準。';
+        }
+
+        return `建議優先整理${focusAreaNames.join('、')}相關問題。`;
     }
 
     function showMockComplete(title, text) {
@@ -571,8 +774,14 @@
         state.currentIndex = 0;
         state.answers = {};
         state.result = null;
+        state.submission = {
+            inFlight: false,
+            submitted: false,
+            assessmentId: ''
+        };
         els.consentCheckbox.checked = false;
         els.startButton.disabled = true;
+        resetModalState();
         renderQuestion();
         showScreen('start');
     }
