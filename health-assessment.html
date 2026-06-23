@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2 分鐘健康關注評估｜元馨醫管家</title>
+    <meta name="description" content="元馨醫管家 2 分鐘健康關注評估，快速整理健檢、生活習慣、睡眠與壓力等健康關注方向。">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="./health-assessment.js"></script>
+    <style>
+        body {
+            background:
+                radial-gradient(circle at 92% 4%, rgba(194, 160, 92, 0.18), transparent 28%),
+                linear-gradient(180deg, #FCFAF4 0%, #F4F8F1 52%, #EEF5F1 100%);
+            color: #173F3A;
+        }
+
+        .yx-card {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid rgba(23, 63, 58, 0.1);
+            box-shadow: 0 18px 44px rgba(23, 63, 58, 0.1);
+        }
+
+        .yx-choice {
+            border: 1px solid rgba(23, 63, 58, 0.14);
+            background: #FFFFFF;
+            transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .yx-choice.is-selected {
+            border-color: #17866F;
+            background: #EEF8F5;
+            box-shadow: 0 0 0 3px rgba(23, 134, 111, 0.13);
+        }
+
+        .yx-primary {
+            background: #17866F;
+            color: #FFFFFF;
+        }
+
+        .yx-primary:hover:not(:disabled) {
+            background: #126B5A;
+        }
+
+        .yx-primary:disabled {
+            background: #A9B9B4;
+            cursor: not-allowed;
+        }
+
+        .yx-secondary {
+            background: #FFFFFF;
+            color: #176B5B;
+            border: 1px solid rgba(23, 107, 91, 0.25);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <main class="mx-auto flex min-h-screen w-full max-w-md flex-col px-5 py-6">
+        <header class="mb-5 flex items-center justify-between">
+            <div>
+                <p class="text-[11px] font-bold tracking-[0.22em] text-[#A77C36]">YUANXIN HEALTHCARE</p>
+                <p class="mt-1 text-sm font-bold text-[#176B5B]">元馨醫管家</p>
+            </div>
+            <span class="rounded-full border border-[#D8BE88] bg-[#FBF5E8] px-3 py-1 text-xs font-bold text-[#8A652B]">Task 03B-2 Mock</span>
+        </header>
+
+        <section id="startScreen" class="yx-card rounded-2xl p-6">
+            <div class="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-[#D8BE88] bg-white text-[#176B5B]" aria-hidden="true">
+                <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 21s-7-4.35-7-11a4 4 0 017-2.65A4 4 0 0119 10c0 6.65-7 11-7 11z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M8.5 12h2l1-2.25L13 14l1-2h1.5"></path>
+                </svg>
+            </div>
+            <h1 class="text-3xl font-black leading-tight text-[#173F3A]">2 分鐘健康關注評估</h1>
+            <p class="mt-4 text-sm leading-7 text-[#58706B]">從健檢、生活習慣、睡眠與壓力，快速了解目前最值得關注的健康方向。</p>
+
+            <div class="mt-6 grid grid-cols-2 gap-3">
+                <div class="rounded-xl bg-[#F2F8F5] p-3 text-sm font-bold text-[#176B5B]">約 2 分鐘完成</div>
+                <div class="rounded-xl bg-[#FBF5E8] p-3 text-sm font-bold text-[#8A652B]">共 12 題</div>
+                <div class="rounded-xl bg-white p-3 text-sm font-bold text-[#355B54]">不需先填個資</div>
+                <div class="rounded-xl bg-white p-3 text-sm font-bold text-[#355B54]">非醫療診斷</div>
+            </div>
+
+            <div class="mt-6 rounded-xl border border-[#E5D5AE] bg-[#FFFBF1] p-4">
+                <label class="flex items-start gap-3 text-sm leading-6 text-[#355B54]">
+                    <input id="consentCheckbox" type="checkbox" class="mt-1 h-4 w-4 rounded border-[#D8BE88] text-[#17866F] focus:ring-[#17866F]">
+                    <span>我已閱讀並同意元馨醫管家蒐集及使用本次健康評估資料，作為產生評估結果、健康需求分析及服務流程改善之用途。我了解本評估不屬於醫療診斷，也不能取代醫師診察。</span>
+                </label>
+            </div>
+
+            <button id="startButton" type="button" class="yx-primary mt-6 min-h-12 w-full rounded-xl px-5 text-base font-bold" disabled>開始評估</button>
+        </section>
+
+        <section id="questionScreen" class="hidden">
+            <div class="mb-4">
+                <div class="mb-2 flex items-center justify-between text-sm font-bold text-[#176B5B]">
+                    <span id="questionCounter">1 / 12</span>
+                    <span id="questionTypeLabel">單選</span>
+                </div>
+                <div class="h-2 overflow-hidden rounded-full bg-white">
+                    <div id="progressBar" class="h-full rounded-full bg-[#17866F]" style="width: 8.33%;"></div>
+                </div>
+            </div>
+
+            <div class="yx-card rounded-2xl p-5">
+                <p id="questionKicker" class="text-[11px] font-bold tracking-[0.18em] text-[#A77C36]">HEALTH CHECK-IN</p>
+                <h2 id="questionTitle" class="mt-3 text-xl font-black leading-8 text-[#173F3A]"></h2>
+                <p id="questionHint" class="mt-3 hidden text-sm leading-6 text-[#6C7D79]"></p>
+                <div id="optionsList" class="mt-5 space-y-3"></div>
+                <p id="validationMessage" class="mt-4 hidden text-sm font-bold text-[#B45309]"></p>
+            </div>
+
+            <div class="mt-5 flex gap-3">
+                <button id="prevButton" type="button" class="yx-secondary min-h-12 flex-1 rounded-xl px-4 text-sm font-bold">上一步</button>
+                <button id="nextButton" type="button" class="yx-primary min-h-12 flex-1 rounded-xl px-4 text-sm font-bold">下一題</button>
+            </div>
+        </section>
+
+        <section id="resultScreen" class="hidden">
+            <div class="yx-card rounded-2xl p-6">
+                <p id="resultLevel" class="text-[11px] font-bold tracking-[0.22em] text-[#A77C36]"></p>
+                <h2 id="resultTitle" class="mt-3 text-2xl font-black leading-9 text-[#173F3A]"></h2>
+                <p id="resultSummary" class="mt-4 text-sm leading-7 text-[#355B54]"></p>
+                <div class="mt-5 rounded-xl bg-[#F2F8F5] p-4">
+                    <p class="text-xs font-bold tracking-[0.16em] text-[#176B5B]">主要健康關注面向</p>
+                    <div id="focusAreas" class="mt-3 flex flex-wrap gap-2"></div>
+                </div>
+                <div class="mt-5">
+                    <h3 class="text-base font-black text-[#173F3A]">深度說明</h3>
+                    <p id="resultDetail" class="mt-2 text-sm leading-7 text-[#355B54]"></p>
+                </div>
+                <div class="mt-5">
+                    <h3 class="text-base font-black text-[#173F3A]">建議下一步</h3>
+                    <p id="resultNextStep" class="mt-2 text-sm leading-7 text-[#355B54]"></p>
+                </div>
+                <div class="mt-5 rounded-xl border border-[#E5D5AE] bg-[#FFFBF1] p-4">
+                    <p class="text-xs font-bold tracking-[0.14em] text-[#8A652B]">免責聲明</p>
+                    <p class="mt-2 text-xs leading-6 text-[#6C5A33]">本評估僅供健康關注與諮詢需求參考，不屬於醫療診斷，也不能取代醫師診察。如有胸痛、呼吸困難、意識異常或其他急性不適，請立即就醫或聯絡當地緊急醫療服務。</p>
+                </div>
+                <div class="mt-6 space-y-3">
+                    <button id="primaryCtaButton" type="button" class="yx-primary min-h-12 w-full rounded-xl px-5 text-base font-bold"></button>
+                    <button id="secondaryCtaButton" type="button" class="yx-secondary min-h-12 w-full rounded-xl px-5 text-base font-bold"></button>
+                    <button id="restartButton" type="button" class="w-full px-5 py-3 text-sm font-bold text-[#6C7D79]">重新評估</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="mockCompleteScreen" class="hidden yx-card rounded-2xl p-6 text-center">
+            <div class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#EEF8F5] text-[#17866F]" aria-hidden="true">
+                <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h2 id="mockCompleteTitle" class="text-2xl font-black text-[#173F3A]"></h2>
+            <p id="mockCompleteText" class="mt-4 text-sm leading-7 text-[#58706B]"></p>
+            <button id="backToResultButton" type="button" class="yx-primary mt-6 min-h-12 w-full rounded-xl px-5 text-base font-bold">返回結果頁</button>
+        </section>
+
+        <p class="mt-auto pt-6 text-center text-xs leading-6 text-[#71817D]">本頁為 Task 03B-2 前端第一版，所有送出流程皆為 mock，不會建立名單或寫入資料。</p>
+    </main>
+
+    <div id="ctaModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-[#173F3A]/45 px-5">
+        <div class="yx-card w-full max-w-sm rounded-2xl p-6">
+            <h2 class="text-xl font-black text-[#173F3A]">確認取得健康建議</h2>
+            <p class="mt-4 text-sm leading-7 text-[#355B54]">我同意由元馨醫管家依本次評估結果提供健康資訊與諮詢建議。</p>
+            <div class="mt-6 flex gap-3">
+                <button id="modalCancelButton" type="button" class="yx-secondary min-h-11 flex-1 rounded-xl px-4 text-sm font-bold">暫時不用</button>
+                <button id="modalConfirmButton" type="button" class="yx-primary min-h-11 flex-1 rounded-xl px-4 text-sm font-bold">同意並送出</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
