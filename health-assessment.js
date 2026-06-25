@@ -3,9 +3,9 @@
 
     const HEALTH_ASSESSMENT_API_ENDPOINT = '/api/submit-health-assessment';
     const CONSENT_VERSION = '2026-06-23-v1';
+    const CONTACT_CONSENT_VERSION = '2026-06-25-v1';
     const EXCLUSIVE_OPTIONS = new Set(['none', 'good']);
     const MAX_Q05_SELECTIONS = 3;
-    const DEFAULT_MODAL_TEXT = '我同意由元馨醫管家依本次評估結果提供健康資訊與諮詢建議。';
 
     const questions = [
         {
@@ -213,6 +213,16 @@
         answers: {},
         result: null,
         sourceContext,
+        assessmentConsentAt: '',
+        healthAdviceConsentAt: '',
+        contact: {
+            userName: '',
+            phone: '',
+            email: '',
+            allowLineMessages: false,
+            allowPhoneContact: false,
+            allowMarketingMessages: false
+        },
         submission: {
             inFlight: false,
             submitted: false,
@@ -257,8 +267,22 @@
             'secondaryCtaButton',
             'restartButton',
             'ctaModal',
+            'ctaIntroStep',
+            'ctaContactStep',
             'modalCancelButton',
-            'modalConfirmButton',
+            'modalContinueButton',
+            'contactName',
+            'contactNameError',
+            'contactPhone',
+            'contactPhoneError',
+            'contactEmail',
+            'contactEmailError',
+            'allowLineMessages',
+            'allowPhoneContact',
+            'allowMarketingMessages',
+            'contactFormStatus',
+            'contactBackButton',
+            'contactSubmitButton',
             'mockCompleteTitle',
             'mockCompleteText',
             'backToResultButton'
@@ -266,22 +290,38 @@
             els[id] = document.getElementById(id);
         });
 
-        els.modalDescription = els.ctaModal.querySelector('p');
     }
 
     function bindEvents() {
         els.consentCheckbox.addEventListener('change', () => {
             els.startButton.disabled = !els.consentCheckbox.checked;
         });
-        els.startButton.addEventListener('click', () => showScreen('question'));
+        els.startButton.addEventListener('click', startAssessment);
         els.prevButton.addEventListener('click', goPrev);
         els.nextButton.addEventListener('click', goNext);
         els.primaryCtaButton.addEventListener('click', openModal);
         els.secondaryCtaButton.addEventListener('click', showSecondaryMock);
         els.restartButton.addEventListener('click', restart);
         els.modalCancelButton.addEventListener('click', closeModal);
-        els.modalConfirmButton.addEventListener('click', submitPrimaryCta);
+        els.modalContinueButton.addEventListener('click', showContactStep);
+        els.contactBackButton.addEventListener('click', showIntroStep);
+        els.contactSubmitButton.addEventListener('click', submitPrimaryCta);
+        els.contactName.addEventListener('input', syncContactState);
+        els.contactPhone.addEventListener('input', syncContactState);
+        els.contactEmail.addEventListener('input', syncContactState);
+        els.allowLineMessages.addEventListener('change', syncContactState);
+        els.allowPhoneContact.addEventListener('change', syncContactState);
+        els.allowMarketingMessages.addEventListener('change', syncContactState);
         els.backToResultButton.addEventListener('click', () => showScreen('result'));
+    }
+
+    function startAssessment() {
+        if (!els.consentCheckbox.checked) {
+            return;
+        }
+
+        state.assessmentConsentAt = new Date().toISOString();
+        showScreen('question');
     }
 
     function readSourceContext() {
@@ -574,20 +614,133 @@
 
     function openModal() {
         resetModalState();
+        showIntroStep();
         els.ctaModal.classList.remove('hidden');
         els.ctaModal.classList.add('flex');
     }
 
     function closeModal() {
+        if (state.submission.inFlight) {
+            return;
+        }
+
         els.ctaModal.classList.add('hidden');
         els.ctaModal.classList.remove('flex');
     }
 
     function resetModalState() {
-        els.modalDescription.textContent = DEFAULT_MODAL_TEXT;
-        els.modalConfirmButton.textContent = state.submission.submitted ? '已完成測試送出' : '同意並送出';
-        els.modalConfirmButton.disabled = state.submission.submitted || state.submission.inFlight;
+        syncContactInputsFromState();
+        clearContactErrors();
+        els.modalContinueButton.disabled = state.submission.submitted || state.submission.inFlight;
         els.modalCancelButton.disabled = state.submission.inFlight;
+        els.contactBackButton.disabled = state.submission.inFlight;
+        els.contactSubmitButton.disabled = state.submission.submitted || state.submission.inFlight;
+        els.contactSubmitButton.textContent = state.submission.submitted ? '已完成測試送出' : '送出並取得建議';
+    }
+
+    function showIntroStep() {
+        if (state.submission.inFlight) {
+            return;
+        }
+
+        els.ctaIntroStep.classList.remove('hidden');
+        els.ctaContactStep.classList.add('hidden');
+    }
+
+    function showContactStep() {
+        if (state.submission.inFlight || state.submission.submitted) {
+            return;
+        }
+
+        if (!state.healthAdviceConsentAt) {
+            state.healthAdviceConsentAt = new Date().toISOString();
+        }
+
+        els.ctaIntroStep.classList.add('hidden');
+        els.ctaContactStep.classList.remove('hidden');
+        window.setTimeout(() => els.contactName.focus(), 0);
+    }
+
+    function syncContactState() {
+        state.contact.userName = els.contactName.value;
+        state.contact.phone = els.contactPhone.value;
+        state.contact.email = els.contactEmail.value;
+        state.contact.allowLineMessages = els.allowLineMessages.checked;
+        state.contact.allowPhoneContact = els.allowPhoneContact.checked;
+        state.contact.allowMarketingMessages = els.allowMarketingMessages.checked;
+    }
+
+    function syncContactInputsFromState() {
+        els.contactName.value = state.contact.userName;
+        els.contactPhone.value = state.contact.phone;
+        els.contactEmail.value = state.contact.email;
+        els.allowLineMessages.checked = state.contact.allowLineMessages;
+        els.allowPhoneContact.checked = state.contact.allowPhoneContact;
+        els.allowMarketingMessages.checked = state.contact.allowMarketingMessages;
+    }
+
+    function clearContactErrors() {
+        [
+            els.contactNameError,
+            els.contactPhoneError,
+            els.contactEmailError,
+            els.contactFormStatus
+        ].forEach(element => {
+            element.textContent = '';
+            element.classList.add('hidden');
+        });
+    }
+
+    function setFieldError(element, message) {
+        element.textContent = message;
+        element.classList.remove('hidden');
+    }
+
+    function normalizePhone(value) {
+        return String(value || '').replace(/\D/g, '');
+    }
+
+    function validateContactForm() {
+        syncContactState();
+        clearContactErrors();
+
+        const userName = state.contact.userName.trim();
+        const normalizedPhone = normalizePhone(state.contact.phone);
+        const email = state.contact.email.trim();
+        let valid = true;
+
+        if (!userName) {
+            setFieldError(els.contactNameError, '請填寫姓名。');
+            valid = false;
+        }
+
+        if (!normalizedPhone) {
+            setFieldError(els.contactPhoneError, '請填寫手機號碼。');
+            valid = false;
+        } else if (!/^09\d{8}$/.test(normalizedPhone)) {
+            setFieldError(els.contactPhoneError, '請輸入09開頭的10位數台灣手機號碼。');
+            valid = false;
+        }
+
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setFieldError(els.contactEmailError, '請輸入有效的電子信箱格式。');
+            valid = false;
+        }
+
+        if (!valid) {
+            return null;
+        }
+
+        state.contact.userName = userName;
+        state.contact.phone = normalizedPhone;
+        state.contact.email = email;
+        syncContactInputsFromState();
+
+        return {
+            userName,
+            phone: normalizedPhone,
+            email
+        };
     }
 
     async function submitPrimaryCta() {
@@ -600,14 +753,23 @@
             return;
         }
 
-        const consentAt = new Date().toISOString();
-        const payload = buildHealthAssessmentPayload(consentAt);
+        const validatedContact = validateContactForm();
+
+        if (!validatedContact) {
+            return;
+        }
+
+        const contactConsentAt = new Date().toISOString();
+        const payload = buildHealthAssessmentPayload(contactConsentAt, validatedContact);
 
         state.submission.inFlight = true;
-        els.modalConfirmButton.disabled = true;
+        els.modalContinueButton.disabled = true;
         els.modalCancelButton.disabled = true;
-        els.modalConfirmButton.textContent = '送出中...';
-        els.modalDescription.textContent = '正在送出 Task 03B-3B 測試資料，請稍候。';
+        els.contactBackButton.disabled = true;
+        els.contactSubmitButton.disabled = true;
+        els.contactSubmitButton.textContent = '送出中...';
+        els.contactFormStatus.textContent = '正在安全保存健康評估測試資料，請稍候。';
+        els.contactFormStatus.classList.remove('hidden');
 
         try {
             const response = await fetch(HEALTH_ASSESSMENT_API_ENDPOINT, {
@@ -627,51 +789,58 @@
                 throw new Error('API 回傳內容不是有效 JSON。');
             }
 
-            if (!response.ok || data.status !== 'success') {
+            if (!response.ok || !['success', 'partial_success'].includes(data.status)) {
                 throw new Error(data.message || data.error || `API 回傳失敗狀態：${response.status}`);
             }
 
             state.submission.submitted = true;
+            state.submission.inFlight = false;
             state.submission.assessmentId = data.assessmentId || '';
             closeModal();
             showMockComplete(
-                'Task 03B-3B 測試送出成功',
-                `這是 Task 03B-3B 測試送出，資料已以測試資料寫入健康評估紀錄；目前尚未建立 CRM 名單。健康評估ID：${state.submission.assessmentId || '未回傳'}`
+                '健康評估測試資料已送出',
+                `資料已以測試資料保存於健康評估紀錄，目前尚未建立或更新CRM名單。健康評估ID：${state.submission.assessmentId || '未回傳'}`
             );
         } catch (error) {
             state.submission.inFlight = false;
-            els.modalConfirmButton.disabled = false;
+            els.modalContinueButton.disabled = false;
             els.modalCancelButton.disabled = false;
-            els.modalConfirmButton.textContent = '重新送出';
-            showModalError(`送出失敗：${error.message || '請稍後再試'}。您仍保留在結果頁，答案不會被清空。`);
+            els.contactBackButton.disabled = false;
+            els.contactSubmitButton.disabled = false;
+            els.contactSubmitButton.textContent = '重新送出';
+            showContactFormError(`送出失敗：${error.message || '請稍後再試'}。作答與聯絡資料均已保留。`);
         }
     }
 
-    function showModalError(message) {
-        els.modalDescription.textContent = message;
+    function showContactFormError(message) {
+        els.contactFormStatus.textContent = message;
+        els.contactFormStatus.classList.remove('hidden');
     }
 
     function showSecondaryMock() {
         showMockComplete(
-            '健康資訊入口將於後續任務串接',
-            '這是 Task 03B-3B 前端保留的次要 CTA mock，沒有呼叫 API、跳轉 LINE、建立名單或寫入資料。'
+            '健康資訊功能準備中',
+            '健康資訊入口將於後續版本正式串接，目前不會跳轉至其他服務。'
         );
     }
 
-    function buildHealthAssessmentPayload(consentAt) {
+    function buildHealthAssessmentPayload(contactConsentAt, identity) {
         const copy = resultCopy[state.result.level];
         const focusAreaNames = state.result.focusAreas.map(area => area.name);
+        const assessmentConsentAt = state.assessmentConsentAt || contactConsentAt;
+        const healthAdviceConsentAt = state.healthAdviceConsentAt || contactConsentAt;
 
         return {
             action: 'submit_health_assessment',
             assessmentId: '',
             identity: {
-                identityStatus: 'anonymous',
+                identityStatus: 'external_identified',
                 lineUserId: '',
                 lineDisplayName: '',
-                userName: '',
-                phone: '',
-                email: ''
+                lineIdentityVerified: false,
+                userName: identity.userName,
+                phone: identity.phone,
+                email: identity.email
             },
             answers: buildAnswersPayload(),
             result: {
@@ -692,13 +861,20 @@
             consent: {
                 dataCollectionConsent: true,
                 dataCollectionConsentVersion: CONSENT_VERSION,
-                dataCollectionConsentAt: consentAt,
+                dataCollectionConsentAt: assessmentConsentAt,
                 healthDataUseConsent: true,
                 healthDataUseConsentVersion: CONSENT_VERSION,
-                healthDataUseConsentAt: consentAt,
+                healthDataUseConsentAt: assessmentConsentAt,
                 healthAdviceConsent: true,
                 healthAdviceConsentVersion: CONSENT_VERSION,
-                healthAdviceConsentAt: consentAt
+                healthAdviceConsentAt
+            },
+            contactConsent: {
+                allowLineMessages: Boolean(state.contact.allowLineMessages),
+                allowPhoneContact: Boolean(state.contact.allowPhoneContact),
+                allowMarketingMessages: Boolean(state.contact.allowMarketingMessages),
+                version: CONTACT_CONSENT_VERSION,
+                consentedAt: contactConsentAt
             },
             sourceContext: {
                 entryType: state.sourceContext.entryType,
@@ -774,6 +950,16 @@
         state.currentIndex = 0;
         state.answers = {};
         state.result = null;
+        state.assessmentConsentAt = '';
+        state.healthAdviceConsentAt = '';
+        state.contact = {
+            userName: '',
+            phone: '',
+            email: '',
+            allowLineMessages: false,
+            allowPhoneContact: false,
+            allowMarketingMessages: false
+        };
         state.submission = {
             inFlight: false,
             submitted: false,
