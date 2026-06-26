@@ -17,6 +17,16 @@ function parseBody(body) {
   return body;
 }
 
+function isInternalCrmValidationRequest(payload) {
+  return (
+    payload &&
+    payload.isTestData === false &&
+    payload.crmValidationMode === 'internal_small_batch' &&
+    payload.allowCrmWriteTestRun === true &&
+    payload.internalValidationRequested === true
+  );
+}
+
 async function handler(req, res) {
   if (req.method !== 'POST') {
     return sendJson(res, 405, { status: 'error', message: 'Method not allowed' });
@@ -34,12 +44,33 @@ async function handler(req, res) {
     return sendJson(res, 400, { status: 'error', message: 'Invalid action' });
   }
 
-  if (payload.isTestData !== true) {
-    return sendJson(res, 400, { status: 'error', message: 'isTestData must be true' });
-  }
-
   if (Object.prototype.hasOwnProperty.call(payload, 'lineAccessToken')) {
     return sendJson(res, 400, { status: 'error', message: 'lineAccessToken is not allowed' });
+  }
+
+  if (payload.isTestData !== true) {
+    if (!isInternalCrmValidationRequest(payload)) {
+      return sendJson(res, 400, {
+        status: 'error',
+        decisionCode: 'CRM_INTERNAL_MODE_REQUIRED',
+        message: 'CRM internal validation mode is required'
+      });
+    }
+
+    const internalValidationToken = process.env.HEALTH_ASSESSMENT_INTERNAL_VALIDATION_TOKEN || '';
+
+    if (!internalValidationToken) {
+      return sendJson(res, 500, {
+        status: 'error',
+        decisionCode: 'INTERNAL_VALIDATION_TOKEN_NOT_CONFIGURED',
+        message: 'Internal validation token is not configured'
+      });
+    }
+
+    payload = {
+      ...payload,
+      internalValidationToken
+    };
   }
 
   try {
