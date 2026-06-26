@@ -331,6 +331,7 @@
         return {
             entryType: inferEntryType(params),
             referralCode: normalizeReferralCode(params.get('ref')),
+            crmInternalTestRequested: isCrmInternalTestMode(params),
             utmSource: params.get('utm_source') || '',
             utmMedium: params.get('utm_medium') || '',
             utmCampaign: params.get('utm_campaign') || '',
@@ -361,6 +362,13 @@
         }
 
         return 'external_anonymous';
+    }
+
+    function isCrmInternalTestMode(params) {
+        const mode = params.get('mode') || '';
+        const crmTest = params.get('crm_test') || '';
+
+        return mode === 'crm_internal_test' || crmTest === '1';
     }
 
     function stripHash(value) {
@@ -801,6 +809,12 @@
                 '健康評估測試資料已送出',
                 `資料已以測試資料保存於健康評估紀錄，目前尚未建立或更新CRM名單。健康評估ID：${state.submission.assessmentId || '未回傳'}`
             );
+            if (payload.isTestData === false) {
+                showMockComplete(
+                    'CRM 內部驗收資料已送出',
+                    `此筆資料已以 CRM 內部小流量驗收模式送出。請依驗收 SOP 檢查 health_assessments 與 leads。健康評估ID：${state.submission.assessmentId || '未回傳'}`
+                );
+            }
         } catch (error) {
             state.submission.inFlight = false;
             els.modalContinueButton.disabled = false;
@@ -829,8 +843,9 @@
         const focusAreaNames = state.result.focusAreas.map(area => area.name);
         const assessmentConsentAt = state.assessmentConsentAt || contactConsentAt;
         const healthAdviceConsentAt = state.healthAdviceConsentAt || contactConsentAt;
+        const isInternalCrmTest = Boolean(state.sourceContext.crmInternalTestRequested);
 
-        return {
+        const payload = {
             action: 'submit_health_assessment',
             assessmentId: '',
             identity: {
@@ -895,8 +910,16 @@
                 operatingSystem: '',
                 browser: ''
             },
-            isTestData: true
+            isTestData: !isInternalCrmTest
         };
+
+        if (isInternalCrmTest) {
+            payload.crmValidationMode = 'internal_small_batch';
+            payload.allowCrmWriteTestRun = true;
+            payload.internalValidationRequested = true;
+        }
+
+        return payload;
     }
 
     function buildAnswersPayload() {
