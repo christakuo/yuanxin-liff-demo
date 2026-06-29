@@ -182,6 +182,7 @@
 
         debugLog('Sending payload:', {
             ...payload,
+            lineUserId: payload.lineUserId ? '[REDACTED]' : '',
             lineAccessToken: payload.lineAccessToken ? '[REDACTED]' : ''
         });
 
@@ -201,7 +202,16 @@
         const result = await response.json();
 
         if (result.status !== 'success') {
-            throw new Error(result.message || 'Webhook processing failed');
+            const error = new Error('Webhook processing failed');
+            const authCode = typeof result.authCode === 'string'
+                ? result.authCode.trim()
+                : '';
+
+            if (/^[A-Z][A-Z0-9_]*$/.test(authCode)) {
+                error.authCode = authCode;
+            }
+
+            throw error;
         }
 
         return result;
@@ -240,6 +250,7 @@
 
         debugLog('Query consultant portal:', {
             ...payload,
+            lineUserId: payload.lineUserId ? '[REDACTED]' : '',
             lineAccessToken: payload.lineAccessToken ? '[REDACTED]' : ''
         });
 
@@ -259,6 +270,10 @@
         }
 
         const result = await response.json();
+
+        if (result && (result.success === false || result.authorized === false)) {
+            return result;
+        }
 
         if (result.status !== 'success' && result.success !== true) {
             throw new Error(

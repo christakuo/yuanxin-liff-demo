@@ -476,8 +476,17 @@
                     return;
                 }
 
+                const lineAccessToken = liff.getAccessToken();
+
+                if (typeof lineAccessToken !== 'string' || lineAccessToken.trim() === '') {
+                    showConsultantPortalError(
+                        '需要完成 LINE 身分驗證，請重新從 LINE 開啟或重新登入。',
+                        'TOKEN_MISSING'
+                    );
+                    return;
+                }
+
                 const profile = await liff.getProfile();
-                const lineAccessToken = liff.getAccessToken() || '';
 
                 const result = await YuanxinReferral.queryConsultantPortal({
                     action: 'getConsultantDashboard',
@@ -491,7 +500,10 @@
                 consultantDashboardCache = result;
 
                 if (!result || result.authorized === false || result.success === false) {
-                    showConsultantPortalError(result && result.message ? result.message : '您目前尚未開通顧問權限。');
+                    showConsultantPortalError(
+                        result && result.message ? result.message : '您目前尚未開通顧問權限。',
+                        result && result.authCode
+                    );
                     return;
                 }
 
@@ -518,9 +530,26 @@
             content.classList.toggle('hidden', state !== 'content');
         }
 
-        function showConsultantPortalError(message) {
+        function getSafeAuthCode(authCode) {
+            if (typeof authCode !== 'string') return '';
+
+            const normalizedCode = authCode.trim();
+            return /^[A-Z][A-Z0-9_]*$/.test(normalizedCode) ? normalizedCode : '';
+        }
+
+        function formatAuthDiagnostic(message, authCode) {
+            const safeAuthCode = getSafeAuthCode(authCode);
+            return safeAuthCode
+                ? `${message}\n錯誤代碼：${safeAuthCode}`
+                : message;
+        }
+
+        function showConsultantPortalError(message, authCode) {
             document.getElementById('consultantPortalSubtitle').innerText = '無法完成顧問權限確認';
-            document.getElementById('consultantPortalErrorText').innerText = message || '請聯繫元馨醫管家管理員。';
+            document.getElementById('consultantPortalErrorText').innerText = formatAuthDiagnostic(
+                message || '請聯繫元馨醫管家管理員。',
+                authCode
+            );
             setConsultantPortalState('error');
         }
 
@@ -594,17 +623,31 @@
             setConsultantResourcesState('loading');
 
             try {
+                const lineAccessToken = identity && identity.lineAccessToken;
+
+                if (typeof lineAccessToken !== 'string' || lineAccessToken.trim() === '') {
+                    showConsultantResourcesError(
+                        '資源載入失敗，請重新從 LINE 開啟或重新登入。',
+                        'TOKEN_MISSING'
+                    );
+                    return;
+                }
+
                 const result = await YuanxinReferral.queryConsultantPortal({
                     action: 'getConsultantResources',
                     lineUserId: identity.lineUserId || '',
                     lineDisplayName: identity.lineDisplayName || '',
-                    lineAccessToken: identity.lineAccessToken || '',
+                    lineAccessToken: lineAccessToken,
                     pageName: 'yuanxin-consultant-portal',
                     sourceChannel: 'LINE_LIFF'
                 });
 
                 if (!result || result.authorized === false || result.success === false) {
-                    throw new Error(result && result.message ? result.message : '無法取得顧問資源');
+                    showConsultantResourcesError(
+                        result && result.message ? result.message : '無法取得顧問資源',
+                        result && result.authCode
+                    );
+                    return;
                 }
 
                 renderConsultantResources(result.resources || []);
@@ -626,9 +669,12 @@
             list.classList.toggle('hidden', state !== 'list');
         }
 
-        function showConsultantResourcesError(message) {
+        function showConsultantResourcesError(message, authCode) {
             document.getElementById('portalResourcesErrorText').innerText =
-                message || '請稍後再試，其他業務大廳功能仍可正常使用。';
+                formatAuthDiagnostic(
+                    message || '請稍後再試，其他業務大廳功能仍可正常使用。',
+                    authCode
+                );
             setConsultantResourcesState('error');
         }
 
@@ -863,20 +909,29 @@
                     const profile = await liff.getProfile();
                     const lineUid = profile.userId;
                     const lineName = profile.displayName;
-                    const lineAccessToken = liff.getAccessToken() || '';
+                    const lineAccessToken = liff.getAccessToken();
 
-                    try {
-                        await YuanxinReferral.sendReferralEvent({
-                            action: 'bind_line_referral',
-                            eventType: 'line_bind',
-                            lineUserId: lineUid,
-                            lineDisplayName: lineName,
-                            lineAccessToken: lineAccessToken,
-                            pageName: 'yuanxin-liff-demo-index',
-                            sourceChannel: 'LINE_LIFF'
-                        });
-                    } catch (webhookError) {
-                        console.error('中央推薦碼 Webhook 傳送失敗：', webhookError);
+                    if (typeof lineAccessToken !== 'string' || lineAccessToken.trim() === '') {
+                        console.warn('略過推薦碼綁定：TOKEN_MISSING');
+                    } else {
+                        try {
+                            await YuanxinReferral.sendReferralEvent({
+                                action: 'bind_line_referral',
+                                eventType: 'line_bind',
+                                lineUserId: lineUid,
+                                lineDisplayName: lineName,
+                                lineAccessToken: lineAccessToken,
+                                pageName: 'yuanxin-liff-demo-index',
+                                sourceChannel: 'LINE_LIFF'
+                            });
+                        } catch (webhookError) {
+                            const authCode = getSafeAuthCode(webhookError && webhookError.authCode);
+                            console.warn(
+                                authCode
+                                    ? `推薦碼綁定未完成：${authCode}`
+                                    : '推薦碼綁定未完成。'
+                            );
+                        }
                     }
 
                     const data = {
