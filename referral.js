@@ -160,6 +160,7 @@
             lineUserId: data.lineUserId || '',
             lineDisplayName: data.lineDisplayName || '',
             lineAccessToken: getLineAccessTokenString(data.lineAccessToken),
+            lineIdToken: getLineAccessTokenString(data.lineIdToken),
             userName: data.userName || '',
             phone: data.phone || '',
             email: data.email || '',
@@ -187,7 +188,8 @@
         debugLog('Sending payload:', {
             ...payload,
             lineUserId: payload.lineUserId ? '[REDACTED]' : '',
-            lineAccessToken: payload.lineAccessToken ? '[REDACTED]' : ''
+            lineAccessToken: payload.lineAccessToken ? '[REDACTED]' : '',
+            lineIdToken: payload.lineIdToken ? '[REDACTED]' : ''
         });
 
         const response = await fetch(config.webhookUrl, {
@@ -246,6 +248,7 @@
             lineUserId: data.lineUserId || '',
             lineDisplayName: data.lineDisplayName || '',
             lineAccessToken: getLineAccessTokenString(data.lineAccessToken),
+            lineIdToken: getLineAccessTokenString(data.lineIdToken),
             pageName: data.pageName || 'yuanxin-consultant-portal',
             sourceChannel: data.sourceChannel || 'LINE_LIFF',
             userAgent: navigator.userAgent || '',
@@ -255,7 +258,8 @@
         debugLog('Query consultant portal:', {
             ...payload,
             lineUserId: payload.lineUserId ? '[REDACTED]' : '',
-            lineAccessToken: payload.lineAccessToken ? '[REDACTED]' : ''
+            lineAccessToken: payload.lineAccessToken ? '[REDACTED]' : '',
+            lineIdToken: payload.lineIdToken ? '[REDACTED]' : ''
         });
 
         const response = await fetch(config.webhookUrl, {

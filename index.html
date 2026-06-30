@@ -477,8 +477,14 @@
                 }
 
                 const lineAccessToken = liff.getAccessToken();
+                const lineIdToken = liff.getIDToken();
 
-                if (typeof lineAccessToken !== 'string' || lineAccessToken.trim() === '') {
+                const hasLineAccessToken =
+                    typeof lineAccessToken === 'string' && lineAccessToken.trim() !== '';
+                const hasLineIdToken =
+                    typeof lineIdToken === 'string' && lineIdToken.trim() !== '';
+
+                if (!hasLineAccessToken && !hasLineIdToken) {
                     showConsultantPortalError(
                         '需要完成 LINE 身分驗證，請重新從 LINE 開啟或重新登入。',
                         'TOKEN_MISSING'
@@ -493,6 +499,7 @@
                     lineUserId: profile.userId,
                     lineDisplayName: profile.displayName,
                     lineAccessToken: lineAccessToken,
+                    lineIdToken: lineIdToken,
                     pageName: 'yuanxin-consultant-portal',
                     sourceChannel: 'LINE_LIFF'
                 });
@@ -512,7 +519,7 @@
                 loadConsultantResources({
                     lineUserId: profile.userId,
                     lineDisplayName: profile.displayName
-                }, lineAccessToken);
+                }, lineAccessToken, lineIdToken);
             } catch (error) {
                 console.error('顧問業務大廳載入失敗：', error);
                 showConsultantPortalError(error.message || '顧問業務大廳載入失敗，請稍後再試。');
@@ -618,7 +625,11 @@
             });
         }
 
-        async function loadConsultantResources(identity, portalLineAccessToken) {
+        async function loadConsultantResources(
+            identity,
+            portalLineAccessToken,
+            portalLineIdToken
+        ) {
             setConsultantResourcesState('loading');
 
             try {
@@ -626,8 +637,15 @@
                     typeof portalLineAccessToken === 'string'
                         ? portalLineAccessToken
                         : '';
+                const lineIdToken =
+                    typeof portalLineIdToken === 'string'
+                        ? portalLineIdToken
+                        : '';
 
-                if (lineAccessToken.trim() === '') {
+                if (
+                    lineAccessToken.trim() === '' &&
+                    lineIdToken.trim() === ''
+                ) {
                     showConsultantResourcesError(
                         '資源載入失敗，請重新從 LINE 開啟或重新登入。',
                         'TOKEN_MISSING'
@@ -640,6 +658,7 @@
                     lineUserId: identity.lineUserId || '',
                     lineDisplayName: identity.lineDisplayName || '',
                     lineAccessToken: lineAccessToken,
+                    lineIdToken: lineIdToken,
                     pageName: 'yuanxin-consultant-portal',
                     sourceChannel: 'LINE_LIFF'
                 });
@@ -912,8 +931,14 @@
                     const lineUid = profile.userId;
                     const lineName = profile.displayName;
                     const lineAccessToken = liff.getAccessToken();
+                    const lineIdToken = liff.getIDToken();
 
-                    if (typeof lineAccessToken !== 'string' || lineAccessToken.trim() === '') {
+                    const hasLineAccessToken =
+                        typeof lineAccessToken === 'string' && lineAccessToken.trim() !== '';
+                    const hasLineIdToken =
+                        typeof lineIdToken === 'string' && lineIdToken.trim() !== '';
+
+                    if (!hasLineAccessToken && !hasLineIdToken) {
                         console.warn('略過推薦碼綁定：TOKEN_MISSING');
                     } else {
                         try {
@@ -923,6 +948,7 @@
                                 lineUserId: lineUid,
                                 lineDisplayName: lineName,
                                 lineAccessToken: lineAccessToken,
+                                lineIdToken: lineIdToken,
                                 pageName: 'yuanxin-liff-demo-index',
                                 sourceChannel: 'LINE_LIFF'
                             });
