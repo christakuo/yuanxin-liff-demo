@@ -226,6 +226,7 @@
         submission: {
             inFlight: false,
             submitted: false,
+            ambiguousSubmitted: false,
             assessmentId: ''
         }
     };
@@ -639,11 +640,15 @@
     function resetModalState() {
         syncContactInputsFromState();
         clearContactErrors();
-        els.modalContinueButton.disabled = state.submission.submitted || state.submission.inFlight;
+        els.modalContinueButton.disabled = state.submission.submitted || state.submission.ambiguousSubmitted || state.submission.inFlight;
         els.modalCancelButton.disabled = state.submission.inFlight;
         els.contactBackButton.disabled = state.submission.inFlight;
-        els.contactSubmitButton.disabled = state.submission.submitted || state.submission.inFlight;
-        els.contactSubmitButton.textContent = state.submission.submitted ? '已完成測試送出' : '送出並取得建議';
+        els.contactSubmitButton.disabled = state.submission.submitted || state.submission.ambiguousSubmitted || state.submission.inFlight;
+        els.contactSubmitButton.textContent = state.submission.submitted
+            ? '已完成測試送出'
+            : state.submission.ambiguousSubmitted
+                ? '送出狀態待確認'
+                : '送出並取得建議';
     }
 
     function showIntroStep() {
@@ -656,7 +661,7 @@
     }
 
     function showContactStep() {
-        if (state.submission.inFlight || state.submission.submitted) {
+        if (state.submission.inFlight || state.submission.submitted || state.submission.ambiguousSubmitted) {
             return;
         }
 
@@ -752,7 +757,7 @@
     }
 
     async function submitPrimaryCta() {
-        if (state.submission.inFlight || state.submission.submitted) {
+        if (state.submission.inFlight || state.submission.submitted || state.submission.ambiguousSubmitted) {
             return;
         }
 
@@ -797,6 +802,11 @@
                 throw new Error('API 回傳內容不是有效 JSON。');
             }
 
+            if (isAmbiguousSubmissionResponse(data)) {
+                showAmbiguousSubmissionState();
+                return;
+            }
+
             if (!response.ok || !['success', 'partial_success'].includes(data.status)) {
                 throw new Error(data.message || data.error || `API 回傳失敗狀態：${response.status}`);
             }
@@ -829,6 +839,34 @@
     function showContactFormError(message) {
         els.contactFormStatus.textContent = message;
         els.contactFormStatus.classList.remove('hidden');
+    }
+
+    function isAmbiguousSubmissionResponse(data) {
+        const ambiguousCodes = new Set([
+            'APP_SCRIPT_NON_JSON_RESPONSE',
+            'APP_SCRIPT_EMPTY_RESPONSE'
+        ]);
+
+        return Boolean(
+            data &&
+            (
+                data.ambiguousSuccess === true ||
+                ambiguousCodes.has(data.code)
+            )
+        );
+    }
+
+    function showAmbiguousSubmissionState() {
+        state.submission.inFlight = false;
+        state.submission.ambiguousSubmitted = true;
+        els.modalContinueButton.disabled = true;
+        els.modalCancelButton.disabled = false;
+        els.contactBackButton.disabled = false;
+        els.contactSubmitButton.disabled = true;
+        els.contactSubmitButton.textContent = '送出狀態待確認';
+        showContactFormError(
+            '資料可能已送出，但系統未收到完整確認。請勿重複送出，我們將由管理員確認紀錄。'
+        );
     }
 
     function showSecondaryMock() {
@@ -986,6 +1024,7 @@
         state.submission = {
             inFlight: false,
             submitted: false,
+            ambiguousSubmitted: false,
             assessmentId: ''
         };
         els.consentCheckbox.checked = false;
@@ -999,6 +1038,7 @@
         questions,
         state,
         calculateResult,
-        sourceContext
+        sourceContext,
+        isAmbiguousSubmissionResponse
     };
 })();
