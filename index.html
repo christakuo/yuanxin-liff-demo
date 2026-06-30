@@ -408,6 +408,7 @@
     <script>
         const LIFF_ID = "2009597152-9nSswjnk";
         let consultantDashboardCache = null;
+        let consultantPortalLineAccessToken = '';
 
         async function initializeLiff() {
             try {
@@ -476,9 +477,13 @@
                     return;
                 }
 
-                const lineAccessToken = liff.getAccessToken();
+                const rawLineAccessToken = liff.getAccessToken();
+                const lineAccessToken = typeof rawLineAccessToken === 'string'
+                    ? rawLineAccessToken.trim()
+                    : '';
 
-                if (typeof lineAccessToken !== 'string' || lineAccessToken.trim() === '') {
+                if (lineAccessToken === '') {
+                    consultantPortalLineAccessToken = '';
                     showConsultantPortalError(
                         '需要完成 LINE 身分驗證，請重新從 LINE 開啟或重新登入。',
                         'TOKEN_MISSING'
@@ -486,13 +491,15 @@
                     return;
                 }
 
+                consultantPortalLineAccessToken = lineAccessToken;
+
                 const profile = await liff.getProfile();
 
                 const result = await YuanxinReferral.queryConsultantPortal({
                     action: 'getConsultantDashboard',
                     lineUserId: profile.userId,
                     lineDisplayName: profile.displayName,
-                    lineAccessToken: lineAccessToken,
+                    lineAccessToken: consultantPortalLineAccessToken,
                     pageName: 'yuanxin-consultant-portal',
                     sourceChannel: 'LINE_LIFF'
                 });
@@ -511,8 +518,7 @@
                 setConsultantPortalState('content');
                 loadConsultantResources({
                     lineUserId: profile.userId,
-                    lineDisplayName: profile.displayName,
-                    lineAccessToken: lineAccessToken
+                    lineDisplayName: profile.displayName
                 });
             } catch (error) {
                 console.error('顧問業務大廳載入失敗：', error);
@@ -623,9 +629,12 @@
             setConsultantResourcesState('loading');
 
             try {
-                const lineAccessToken = identity && identity.lineAccessToken;
+                const lineAccessToken =
+                    typeof consultantPortalLineAccessToken === 'string'
+                        ? consultantPortalLineAccessToken.trim()
+                        : '';
 
-                if (typeof lineAccessToken !== 'string' || lineAccessToken.trim() === '') {
+                if (lineAccessToken === '') {
                     showConsultantResourcesError(
                         '資源載入失敗，請重新從 LINE 開啟或重新登入。',
                         'TOKEN_MISSING'
