@@ -409,6 +409,57 @@
         const LIFF_ID = "2009597152-9nSswjnk";
         let consultantDashboardCache = null;
 
+        function getFrontendTokenLengthBucket(value) {
+            if (typeof value !== 'string' || value.length === 0) return 'EMPTY';
+            if (value.length < 20) return 'LT_20';
+            if (value.length < 100) return 'LEN_20_99';
+            if (value.length < 500) return 'LEN_100_499';
+            if (value.length < 1000) return 'LEN_500_999';
+            return 'LEN_1000_PLUS';
+        }
+
+        function getFrontendTokenValueType(value) {
+            if (value === null) return 'null';
+            if (Array.isArray(value)) return 'array';
+            return typeof value;
+        }
+
+        function getLineIdTokenResult() {
+            try {
+                const value = liff.getIDToken();
+                const hasValue = typeof value === 'string' && value.trim() !== '';
+
+                return {
+                    token: hasValue ? value : '',
+                    status: hasValue ? 'GET_ID_TOKEN_OK' : 'GET_ID_TOKEN_EMPTY',
+                    valueType: getFrontendTokenValueType(value),
+                    lengthBucket: getFrontendTokenLengthBucket(value),
+                    looksJwtLike: hasValue &&
+                        /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(value)
+                };
+            } catch (error) {
+                return {
+                    token: '',
+                    status: 'GET_ID_TOKEN_EXCEPTION',
+                    valueType: 'unknown',
+                    lengthBucket: 'EMPTY',
+                    looksJwtLike: false
+                };
+            }
+        }
+
+        function buildFrontendLineAuthDiagnostics(lineAccessToken, idTokenResult) {
+            return {
+                frontendHasLineAccessToken:
+                    typeof lineAccessToken === 'string' && lineAccessToken.trim() !== '',
+                frontendHasLineIdToken: idTokenResult.token !== '',
+                frontendLineIdTokenValueType: idTokenResult.valueType,
+                frontendLineIdTokenLengthBucket: idTokenResult.lengthBucket,
+                frontendLineIdTokenLooksJwtLike: idTokenResult.looksJwtLike,
+                frontendLineIdTokenGetMethodStatus: idTokenResult.status
+            };
+        }
+
         async function initializeLiff() {
             try {
                 await liff.init({ liffId: LIFF_ID });
@@ -477,7 +528,13 @@
                 }
 
                 const lineAccessToken = liff.getAccessToken();
-                const lineIdToken = liff.getIDToken();
+                const lineIdTokenResult = getLineIdTokenResult();
+                const lineIdToken = lineIdTokenResult.token;
+                const frontendAuthDiagnostics =
+                    buildFrontendLineAuthDiagnostics(
+                        lineAccessToken,
+                        lineIdTokenResult
+                    );
 
                 const hasLineAccessToken =
                     typeof lineAccessToken === 'string' && lineAccessToken.trim() !== '';
@@ -500,6 +557,7 @@
                     lineDisplayName: profile.displayName,
                     lineAccessToken: lineAccessToken,
                     lineIdToken: lineIdToken,
+                    ...frontendAuthDiagnostics,
                     pageName: 'yuanxin-consultant-portal',
                     sourceChannel: 'LINE_LIFF'
                 });
@@ -519,7 +577,7 @@
                 loadConsultantResources({
                     lineUserId: profile.userId,
                     lineDisplayName: profile.displayName
-                }, lineAccessToken, lineIdToken);
+                }, lineAccessToken, lineIdToken, frontendAuthDiagnostics);
             } catch (error) {
                 console.error('顧問業務大廳載入失敗：', error);
                 showConsultantPortalError(error.message || '顧問業務大廳載入失敗，請稍後再試。');
@@ -628,7 +686,8 @@
         async function loadConsultantResources(
             identity,
             portalLineAccessToken,
-            portalLineIdToken
+            portalLineIdToken,
+            frontendAuthDiagnostics
         ) {
             setConsultantResourcesState('loading');
 
@@ -659,6 +718,7 @@
                     lineDisplayName: identity.lineDisplayName || '',
                     lineAccessToken: lineAccessToken,
                     lineIdToken: lineIdToken,
+                    ...frontendAuthDiagnostics,
                     pageName: 'yuanxin-consultant-portal',
                     sourceChannel: 'LINE_LIFF'
                 });
@@ -931,7 +991,13 @@
                     const lineUid = profile.userId;
                     const lineName = profile.displayName;
                     const lineAccessToken = liff.getAccessToken();
-                    const lineIdToken = liff.getIDToken();
+                    const lineIdTokenResult = getLineIdTokenResult();
+                    const lineIdToken = lineIdTokenResult.token;
+                    const frontendAuthDiagnostics =
+                        buildFrontendLineAuthDiagnostics(
+                            lineAccessToken,
+                            lineIdTokenResult
+                        );
 
                     const hasLineAccessToken =
                         typeof lineAccessToken === 'string' && lineAccessToken.trim() !== '';
@@ -949,6 +1015,7 @@
                                 lineDisplayName: lineName,
                                 lineAccessToken: lineAccessToken,
                                 lineIdToken: lineIdToken,
+                                ...frontendAuthDiagnostics,
                                 pageName: 'yuanxin-liff-demo-index',
                                 sourceChannel: 'LINE_LIFF'
                             });
