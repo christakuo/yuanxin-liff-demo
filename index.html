@@ -408,7 +408,6 @@
     <script>
         const LIFF_ID = "2009597152-9nSswjnk";
         let consultantDashboardCache = null;
-        let consultantPortalLineAccessToken = '';
 
         async function initializeLiff() {
             try {
@@ -477,13 +476,9 @@
                     return;
                 }
 
-                const rawLineAccessToken = liff.getAccessToken();
-                const lineAccessToken = typeof rawLineAccessToken === 'string'
-                    ? rawLineAccessToken.trim()
-                    : '';
+                const lineAccessToken = liff.getAccessToken();
 
-                if (lineAccessToken === '') {
-                    consultantPortalLineAccessToken = '';
+                if (typeof lineAccessToken !== 'string' || lineAccessToken.trim() === '') {
                     showConsultantPortalError(
                         '需要完成 LINE 身分驗證，請重新從 LINE 開啟或重新登入。',
                         'TOKEN_MISSING'
@@ -491,15 +486,13 @@
                     return;
                 }
 
-                consultantPortalLineAccessToken = lineAccessToken;
-
                 const profile = await liff.getProfile();
 
                 const result = await YuanxinReferral.queryConsultantPortal({
                     action: 'getConsultantDashboard',
                     lineUserId: profile.userId,
                     lineDisplayName: profile.displayName,
-                    lineAccessToken: consultantPortalLineAccessToken,
+                    lineAccessToken: lineAccessToken,
                     pageName: 'yuanxin-consultant-portal',
                     sourceChannel: 'LINE_LIFF'
                 });
@@ -519,7 +512,7 @@
                 loadConsultantResources({
                     lineUserId: profile.userId,
                     lineDisplayName: profile.displayName
-                });
+                }, lineAccessToken);
             } catch (error) {
                 console.error('顧問業務大廳載入失敗：', error);
                 showConsultantPortalError(error.message || '顧問業務大廳載入失敗，請稍後再試。');
@@ -625,16 +618,16 @@
             });
         }
 
-        async function loadConsultantResources(identity) {
+        async function loadConsultantResources(identity, portalLineAccessToken) {
             setConsultantResourcesState('loading');
 
             try {
                 const lineAccessToken =
-                    typeof consultantPortalLineAccessToken === 'string'
-                        ? consultantPortalLineAccessToken.trim()
+                    typeof portalLineAccessToken === 'string'
+                        ? portalLineAccessToken
                         : '';
 
-                if (lineAccessToken === '') {
+                if (lineAccessToken.trim() === '') {
                     showConsultantResourcesError(
                         '資源載入失敗，請重新從 LINE 開啟或重新登入。',
                         'TOKEN_MISSING'
