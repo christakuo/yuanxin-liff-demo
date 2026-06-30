@@ -29,6 +29,31 @@
         return typeof value === 'string' ? value : '';
     }
 
+    function getSafeDiagnosticString(value) {
+        if (typeof value !== 'string') return '';
+        const normalized = value.trim();
+        return /^[A-Za-z][A-Za-z0-9_]*$/.test(normalized)
+            ? normalized
+            : '';
+    }
+
+    function buildFrontendLineAuthDiagnostics(data = {}) {
+        return {
+            frontendHasLineAccessToken:
+                data.frontendHasLineAccessToken === true,
+            frontendHasLineIdToken:
+                data.frontendHasLineIdToken === true,
+            frontendLineIdTokenValueType:
+                getSafeDiagnosticString(data.frontendLineIdTokenValueType),
+            frontendLineIdTokenLengthBucket:
+                getSafeDiagnosticString(data.frontendLineIdTokenLengthBucket),
+            frontendLineIdTokenLooksJwtLike:
+                data.frontendLineIdTokenLooksJwtLike === true,
+            frontendLineIdTokenGetMethodStatus:
+                getSafeDiagnosticString(data.frontendLineIdTokenGetMethodStatus)
+        };
+    }
+
     function readReferralFromUrl() {
         const params = new URLSearchParams(window.location.search);
         return normalizeReferralCode(params.get('ref'));
@@ -161,6 +186,7 @@
             lineDisplayName: data.lineDisplayName || '',
             lineAccessToken: getLineAccessTokenString(data.lineAccessToken),
             lineIdToken: getLineAccessTokenString(data.lineIdToken),
+            ...buildFrontendLineAuthDiagnostics(data),
             userName: data.userName || '',
             phone: data.phone || '',
             email: data.email || '',
@@ -249,6 +275,7 @@
             lineDisplayName: data.lineDisplayName || '',
             lineAccessToken: getLineAccessTokenString(data.lineAccessToken),
             lineIdToken: getLineAccessTokenString(data.lineIdToken),
+            ...buildFrontendLineAuthDiagnostics(data),
             pageName: data.pageName || 'yuanxin-consultant-portal',
             sourceChannel: data.sourceChannel || 'LINE_LIFF',
             userAgent: navigator.userAgent || '',
