@@ -25,8 +25,8 @@
         return String(ref || '').trim().toUpperCase();
     }
 
-    function normalizeLineAccessToken(value) {
-        return typeof value === 'string' ? value.trim() : '';
+    function getLineAccessTokenString(value) {
+        return typeof value === 'string' ? value : '';
     }
 
     function readReferralFromUrl() {
@@ -159,7 +159,7 @@
             referralCode: getReferralCode(),
             lineUserId: data.lineUserId || '',
             lineDisplayName: data.lineDisplayName || '',
-            lineAccessToken: normalizeLineAccessToken(data.lineAccessToken),
+            lineAccessToken: getLineAccessTokenString(data.lineAccessToken),
             userName: data.userName || '',
             phone: data.phone || '',
             email: data.email || '',
@@ -245,7 +245,7 @@
             action: data.action || 'getConsultantDashboard',
             lineUserId: data.lineUserId || '',
             lineDisplayName: data.lineDisplayName || '',
-            lineAccessToken: normalizeLineAccessToken(data.lineAccessToken),
+            lineAccessToken: getLineAccessTokenString(data.lineAccessToken),
             pageName: data.pageName || 'yuanxin-consultant-portal',
             sourceChannel: data.sourceChannel || 'LINE_LIFF',
             userAgent: navigator.userAgent || '',
