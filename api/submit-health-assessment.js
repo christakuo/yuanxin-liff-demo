@@ -3,6 +3,7 @@ const { randomUUID } = require('crypto');
 
 const AMBIGUOUS_RESPONSE_MESSAGE =
   '資料可能已送出，但系統未收到完整確認。請勿重複送出，請聯繫管理員確認。';
+const SUBMISSION_ID_PATTERN = /^HASUB-\d{8}-[a-z0-9]{10}$/;
 
 function sendJson(res, statusCode, body) {
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
@@ -29,6 +30,26 @@ function isInternalCrmValidationRequest(payload) {
     payload.allowCrmWriteTestRun === true &&
     payload.internalValidationRequested === true
   );
+}
+
+function validateSubmissionId(value) {
+  if (typeof value !== 'string' || !value) {
+    return {
+      valid: false,
+      code: 'SUBMISSION_ID_REQUIRED',
+      message: 'submissionId is required'
+    };
+  }
+
+  if (!SUBMISSION_ID_PATTERN.test(value)) {
+    return {
+      valid: false,
+      code: 'INVALID_SUBMISSION_ID',
+      message: 'submissionId format is invalid'
+    };
+  }
+
+  return { valid: true, value };
 }
 
 function classifyUpstreamBody(body) {
@@ -106,6 +127,22 @@ async function handler(req, res) {
     return sendJson(res, 400, { status: 'error', message: 'Invalid action' });
   }
 
+  const submissionIdValidation = validateSubmissionId(payload.submissionId);
+
+  if (!submissionIdValidation.valid) {
+    return sendJson(res, 400, {
+      status: 'error',
+      success: false,
+      code: submissionIdValidation.code,
+      message: submissionIdValidation.message
+    });
+  }
+
+  payload = {
+    ...payload,
+    submissionId: submissionIdValidation.value
+  };
+
   if (Object.prototype.hasOwnProperty.call(payload, 'lineAccessToken')) {
     return sendJson(res, 400, { status: 'error', message: 'lineAccessToken is not allowed' });
   }
@@ -178,5 +215,6 @@ async function handler(req, res) {
 module.exports = handler;
 module.exports._test = {
   buildAmbiguousResponse,
-  classifyUpstreamBody
+  classifyUpstreamBody,
+  validateSubmissionId
 };

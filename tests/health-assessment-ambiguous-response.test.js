@@ -41,33 +41,59 @@ function createUpstreamResponse(body, options = {}) {
   };
 }
 
-async function invokeProxy(upstreamResponse) {
+async function invokeProxy(upstreamResponse, body = {}) {
   const originalFetch = global.fetch;
   const response = createResponse();
+  let forwardedRequest = null;
 
-  global.fetch = async () => upstreamResponse;
+  global.fetch = async (url, options) => {
+    forwardedRequest = { url, options };
+    return upstreamResponse;
+  };
 
   try {
     await handler({
       method: 'POST',
       body: {
         action: 'submit_health_assessment',
-        isTestData: true
+        submissionId: 'HASUB-20260701-k7f3x9q2m4',
+        isTestData: true,
+        ...body
       }
     }, response);
   } finally {
     global.fetch = originalFetch;
   }
 
+  response.forwardedRequest = forwardedRequest;
+
   return response;
 }
 
-function loadFrontendTestApi() {
+function loadFrontendTestApi(options = {}) {
   const sourcePath = path.join(__dirname, '..', 'health-assessment.js');
   const source = fs.readFileSync(sourcePath, 'utf8');
+  const storageValues = new Map();
+  const sessionStorage = {
+    getItem(key) {
+      return storageValues.has(key) ? storageValues.get(key) : null;
+    },
+    setItem(key, value) {
+      storageValues.set(key, String(value));
+    },
+    removeItem(key) {
+      storageValues.delete(key);
+    }
+  };
   const context = {
     URLSearchParams,
+    Uint8Array,
+    Math,
+    Date,
     console,
+    navigator: {
+      userAgent: 'health-assessment-local-test'
+    },
     document: {
       referrer: '',
       addEventListener() {},
@@ -76,6 +102,8 @@ function loadFrontendTestApi() {
       }
     },
     window: {
+      sessionStorage: options.storageUnavailable ? null : sessionStorage,
+      crypto: require('crypto').webcrypto,
       location: {
         href: 'https://example.invalid/health-assessment.html',
         search: ''
@@ -89,7 +117,8 @@ function loadFrontendTestApi() {
 
   return {
     api: context.window.YuanxinHealthAssessmentMock,
-    source
+    source,
+    storageValues
   };
 }
 
@@ -107,6 +136,10 @@ async function run() {
 
   assert.strictEqual(successResponse.statusCode, 200);
   assert.deepStrictEqual(successResponse.body, successfulPayload);
+  assert.strictEqual(
+    JSON.parse(successResponse.forwardedRequest.options.body).submissionId,
+    'HASUB-20260701-k7f3x9q2m4'
+  );
 
   const rawBodySentinel = '<html>RAW_BODY_SENTINEL</html>';
   const htmlResponse = await invokeProxy(
@@ -144,6 +177,37 @@ async function run() {
   assert.strictEqual(emptyResponse.body.diagnostics.upstreamBodyLength, 0);
   assert.strictEqual(emptyResponse.body.diagnostics.upstreamBodyKind, 'empty');
 
+  const missingSubmissionResponse = await invokeProxy(
+    createUpstreamResponse('{}'),
+    { submissionId: '' }
+  );
+  assert.strictEqual(missingSubmissionResponse.statusCode, 400);
+  assert.strictEqual(missingSubmissionResponse.body.code, 'SUBMISSION_ID_REQUIRED');
+
+  const invalidSubmissionResponse = await invokeProxy(
+    createUpstreamResponse('{}'),
+    {
+      submissionId: 'HASUB-invalid-person@example.com-0912345678',
+      userName: '敏感姓名',
+      phone: '0912345678',
+      email: 'person@example.com',
+      lineUserId: 'LINE_SECRET',
+      token: 'TOKEN_SECRET'
+    }
+  );
+  assert.strictEqual(invalidSubmissionResponse.statusCode, 400);
+  assert.strictEqual(invalidSubmissionResponse.body.code, 'INVALID_SUBMISSION_ID');
+  const invalidBodyText = JSON.stringify(invalidSubmissionResponse.body);
+  ['敏感姓名', '0912345678', 'person@example.com', 'LINE_SECRET', 'TOKEN_SECRET']
+    .forEach(secret => assert.ok(!invalidBodyText.includes(secret)));
+
+  const whitespaceSubmissionResponse = await invokeProxy(
+    createUpstreamResponse('{}'),
+    { submissionId: ' HASUB-20260701-k7f3x9q2m4 ' }
+  );
+  assert.strictEqual(whitespaceSubmissionResponse.statusCode, 400);
+  assert.strictEqual(whitespaceSubmissionResponse.body.code, 'INVALID_SUBMISSION_ID');
+
   const { api, source } = loadFrontendTestApi();
 
   assert.strictEqual(
@@ -168,6 +232,55 @@ async function run() {
   );
   assert.strictEqual(api.state.submission.ambiguousSubmitted, false);
 
+  const firstSubmissionId = api.getOrCreateSubmissionId();
+  const repeatedSubmissionId = api.getOrCreateSubmissionId();
+  assert.match(firstSubmissionId, /^HASUB-\d{8}-[a-z0-9]{10}$/);
+  assert.strictEqual(repeatedSubmissionId, firstSubmissionId);
+
+  api.state.result = {
+    level: 'L1',
+    total: 0,
+    focusAreas: [],
+    consultationIntent: ''
+  };
+  const frontendPayload = api.buildHealthAssessmentPayload(
+    '2026-07-01T00:00:00.000Z',
+    {
+      userName: '本機測試',
+      phone: '0900000000',
+      email: ''
+    }
+  );
+  assert.strictEqual(frontendPayload.submissionId, firstSubmissionId);
+
+  api.saveSubmissionStatus('ambiguous', '');
+  const restoredAmbiguousState = api.buildInitialSubmissionState();
+  assert.strictEqual(restoredAmbiguousState.ambiguousSubmitted, true);
+  assert.strictEqual(restoredAmbiguousState.submissionId, firstSubmissionId);
+
+  api.clearStoredSubmission();
+  const restartedSubmissionId = api.getOrCreateSubmissionId();
+  assert.notStrictEqual(restartedSubmissionId, firstSubmissionId);
+
+  const { api: memoryApi } = loadFrontendTestApi({
+    storageUnavailable: true
+  });
+  const memorySubmissionId = memoryApi.getOrCreateSubmissionId();
+  assert.strictEqual(
+    memoryApi.getOrCreateSubmissionId(),
+    memorySubmissionId
+  );
+  memoryApi.saveSubmissionStatus('ambiguous', '');
+  assert.strictEqual(
+    memoryApi.buildInitialSubmissionState().ambiguousSubmitted,
+    true
+  );
+  memoryApi.clearStoredSubmission();
+  assert.notStrictEqual(
+    memoryApi.getOrCreateSubmissionId(),
+    memorySubmissionId
+  );
+
   const ambiguousUiSource = source.slice(
     source.indexOf('function showAmbiguousSubmissionState()'),
     source.indexOf('function showSecondaryMock()')
@@ -181,6 +294,13 @@ async function run() {
   assert.ok(source.includes('state.submission.submitted = true'));
   assert.ok(source.includes('CRM 內部驗收資料已送出'));
   assert.ok(source.includes("action: 'submit_health_assessment'"));
+  assert.ok(source.includes('submissionId: getOrCreateSubmissionId()'));
+  assert.ok(source.includes('clearStoredSubmission();'));
+  const ordinaryFailureSource = source.slice(
+    source.indexOf('} catch (error) {', source.indexOf('async function submitPrimaryCta()')),
+    source.indexOf('function showContactFormError')
+  );
+  assert.ok(!ordinaryFailureSource.includes('clearStoredSubmission'));
   assert.ok(source.includes("payload.crmValidationMode = 'internal_small_batch'"));
   assert.ok(source.includes('payload.allowCrmWriteTestRun = true'));
   assert.ok(source.includes('payload.internalValidationRequested = true'));

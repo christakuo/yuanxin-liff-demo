@@ -2,6 +2,11 @@
     'use strict';
 
     const HEALTH_ASSESSMENT_API_ENDPOINT = '/api/submit-health-assessment';
+    const SUBMISSION_ID_STORAGE_KEY = 'yuanxin.healthAssessment.submissionId';
+    const SUBMISSION_STATUS_STORAGE_KEY = 'yuanxin.healthAssessment.submissionStatus';
+    const SUBMISSION_ASSESSMENT_ID_STORAGE_KEY = 'yuanxin.healthAssessment.assessmentId';
+    const SUBMISSION_ID_PATTERN = /^HASUB-\d{8}-[a-z0-9]{10}$/;
+    const submissionMemory = {};
     const CONSENT_VERSION = '2026-06-23-v1';
     const CONTACT_CONSENT_VERSION = '2026-06-25-v1';
     const EXCLUSIVE_OPTIONS = new Set(['none', 'good']);
@@ -207,6 +212,98 @@
         }
     };
 
+    function getSessionStorage() {
+        try {
+            return window.sessionStorage || null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function readSessionValue(key) {
+        const storage = getSessionStorage();
+        if (storage) {
+            const storedValue = storage.getItem(key);
+            if (storedValue !== null) {
+                submissionMemory[key] = storedValue;
+                return storedValue;
+            }
+        }
+
+        return submissionMemory[key] || '';
+    }
+
+    function writeSessionValue(key, value) {
+        const storage = getSessionStorage();
+        submissionMemory[key] = String(value || '');
+        if (storage) {
+            storage.setItem(key, submissionMemory[key]);
+        }
+    }
+
+    function clearStoredSubmission() {
+        const storage = getSessionStorage();
+        [
+            SUBMISSION_ID_STORAGE_KEY,
+            SUBMISSION_STATUS_STORAGE_KEY,
+            SUBMISSION_ASSESSMENT_ID_STORAGE_KEY
+        ].forEach(key => {
+            delete submissionMemory[key];
+            if (storage) {
+                storage.removeItem(key);
+            }
+        });
+    }
+
+    function generateSubmissionId() {
+        const dateText = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        const alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        const bytes = new Uint8Array(10);
+
+        if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+            window.crypto.getRandomValues(bytes);
+        } else {
+            for (let index = 0; index < bytes.length; index += 1) {
+                bytes[index] = Math.floor(Math.random() * 256);
+            }
+        }
+
+        const randomText = Array.from(bytes, value => alphabet[value % alphabet.length]).join('');
+        return `HASUB-${dateText}-${randomText}`;
+    }
+
+    function getOrCreateSubmissionId() {
+        const storedId = readSessionValue(SUBMISSION_ID_STORAGE_KEY);
+
+        if (SUBMISSION_ID_PATTERN.test(storedId)) {
+            return storedId;
+        }
+
+        const submissionId = generateSubmissionId();
+        writeSessionValue(SUBMISSION_ID_STORAGE_KEY, submissionId);
+        writeSessionValue(SUBMISSION_STATUS_STORAGE_KEY, 'draft');
+        writeSessionValue(SUBMISSION_ASSESSMENT_ID_STORAGE_KEY, '');
+        return submissionId;
+    }
+
+    function saveSubmissionStatus(status, assessmentId) {
+        writeSessionValue(SUBMISSION_STATUS_STORAGE_KEY, status);
+        writeSessionValue(SUBMISSION_ASSESSMENT_ID_STORAGE_KEY, assessmentId || '');
+    }
+
+    function buildInitialSubmissionState() {
+        const submissionId = readSessionValue(SUBMISSION_ID_STORAGE_KEY);
+        const status = readSessionValue(SUBMISSION_STATUS_STORAGE_KEY);
+
+        return {
+            inFlight: false,
+            submitted: status === 'submitted',
+            ambiguousSubmitted: status === 'ambiguous',
+            assessmentId: readSessionValue(SUBMISSION_ASSESSMENT_ID_STORAGE_KEY),
+            submissionId: SUBMISSION_ID_PATTERN.test(submissionId) ? submissionId : ''
+        };
+    }
+
     const sourceContext = readSourceContext();
     const state = {
         currentIndex: 0,
@@ -223,12 +320,7 @@
             allowPhoneContact: false,
             allowMarketingMessages: false
         },
-        submission: {
-            inFlight: false,
-            submitted: false,
-            ambiguousSubmitted: false,
-            assessmentId: ''
-        }
+        submission: buildInitialSubmissionState()
     };
 
     const els = {};
@@ -321,6 +413,7 @@
             return;
         }
 
+        state.submission.submissionId = getOrCreateSubmissionId();
         state.assessmentConsentAt = new Date().toISOString();
         showScreen('question');
     }
@@ -814,6 +907,7 @@
             state.submission.submitted = true;
             state.submission.inFlight = false;
             state.submission.assessmentId = data.assessmentId || '';
+            saveSubmissionStatus('submitted', state.submission.assessmentId);
             closeModal();
             showMockComplete(
                 '健康評估測試資料已送出',
@@ -859,6 +953,7 @@
     function showAmbiguousSubmissionState() {
         state.submission.inFlight = false;
         state.submission.ambiguousSubmitted = true;
+        saveSubmissionStatus('ambiguous', state.submission.assessmentId);
         els.modalContinueButton.disabled = true;
         els.modalCancelButton.disabled = false;
         els.contactBackButton.disabled = false;
@@ -885,6 +980,7 @@
 
         const payload = {
             action: 'submit_health_assessment',
+            submissionId: getOrCreateSubmissionId(),
             assessmentId: '',
             identity: {
                 identityStatus: 'external_identified',
@@ -1008,6 +1104,8 @@
     }
 
     function restart() {
+        clearStoredSubmission();
+        const newSubmissionId = getOrCreateSubmissionId();
         state.currentIndex = 0;
         state.answers = {};
         state.result = null;
@@ -1025,7 +1123,8 @@
             inFlight: false,
             submitted: false,
             ambiguousSubmitted: false,
-            assessmentId: ''
+            assessmentId: '',
+            submissionId: newSubmissionId
         };
         els.consentCheckbox.checked = false;
         els.startButton.disabled = true;
@@ -1039,6 +1138,13 @@
         state,
         calculateResult,
         sourceContext,
-        isAmbiguousSubmissionResponse
+        isAmbiguousSubmissionResponse,
+        generateSubmissionId,
+        getOrCreateSubmissionId,
+        clearStoredSubmission,
+        saveSubmissionStatus,
+        buildInitialSubmissionState,
+        buildHealthAssessmentPayload,
+        restart
     };
 })();
